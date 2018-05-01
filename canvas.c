@@ -584,8 +584,8 @@ c_canvas()
   if(!picat_is_integer(x) || !picat_is_integer(y)){
     return PICAT_FALSE;
   }
-  long cX = picat_get_integer(x);
-  long cY = picat_get_integer(y);
+  long cX = (long) picat_get_integer(x) / 1.75;
+  long cY = (long) picat_get_integer(y) / 2.12;
 
   snprintf(canvasSize, 100, "%lix%li", cX, cY);
   Ihandle *dlg, *cnvs;
@@ -605,7 +605,10 @@ c_canvas()
 
   cdcanvas = cdCreateCanvas( CD_IUP, cnvs );
   cdCanvasSetAttribute(cdcanvas, "ANTIALIAS", "0");
-  
+  int *width = malloc(sizeof(int));
+  int *height = malloc(sizeof(int));
+  cdCanvasGetSize(cdcanvas, width, height, NULL, NULL);
+  printf("height %d %d", *width, *height);   
   IupShowXY( dlg, IUP_CENTER, IUP_CENTER );
   IupMainLoop();
   IupClose();  

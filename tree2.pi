@@ -1,10 +1,11 @@
 main =>
+  bp.c_clearCanvas(),
   X = 200,
   Y = 100,
   Size = 40,
-  bp.c_circle( X - 50, 180, Size, 0),
-  bp.c_line(X - 30, 150, X, 90),
-  bp.c_line(X - 30, 150, X - 60,90),
+  bp.c_circle( X/2 - Size/2, Y - Size / 2, Size, 0),
+  bp.c_line(X/2, Y - 3 * Size / 2, X / 4, Y - 80),
+  bp.c_line(X/2, Y - 3 * Size / 2, X * 3 / 4,Y - 80),
   bp.c_canvas(X,Y),
   bp.c_clearCanvas().
 
