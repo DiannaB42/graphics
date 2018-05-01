@@ -107,7 +107,7 @@ int redraw_cb( Ihandle *self, float x, float y )
   while(node != NULL){
     switch(node->type){
       case 1: ;
-        struct Lines *line = node->value;  
+        struct Lines *line = node->value; 
         cdCanvasLine(cdcanvas, line->x1, line->y1, line->x2, line->y2);
         break;
       case 0: ;
@@ -340,7 +340,7 @@ c_oval(){
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc((int)cX1 + cX2/2,(int) cX2,(int) cY1 - cY2/2, (int)cY2, 0, 360, (int)cFill, Circle); 
+  assignArc((int)cX1 + cX2/2,(int) cX2,(int) cY1 - cY2/2, (int)cY2, 0, 360, (int) cFill, Circle); 
   return PICAT_TRUE;
 }
 
@@ -349,26 +349,48 @@ c_circle(){
   TERM y1 = picat_get_call_arg(2,4);
   TERM x2 = picat_get_call_arg(3,4);
   TERM fill = picat_get_call_arg(4,4);
-  if(!picat_is_integer(x1) || !picat_is_integer(x2) || !picat_is_integer(y1) || !picat_is_integer(fill)){
-    return PICAT_FALSE;
+  float cx = 0;
+  float cy = 0;
+  float cx2= 0;
+  if (!picat_is_integer(x1)){
+    if (!picat_is_float(x1)){
+      return PICAT_FALSE;
+    } else {
+      cx = picat_get_float(x1); 
+    }
+  } else {
+    int cXint = picat_get_integer(x1);
+    cx = (float) cXint;
   }
-  long cX1 = picat_get_integer(x1);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if (!picat_is_integer(y1)){
+    if (!picat_is_float(y1)){
+      return PICAT_FALSE;
+    } else {
+      cy = picat_get_float(y1); 
+    }
+  } else {
+    int cYint = picat_get_integer(y1);
+    cy = (float) cYint;
   }
-  long cX2 = picat_get_integer(x2);
-  if(exception == NULL){
-    return PICAT_FALSE;
+
+  if (!picat_is_integer(x2)){
+    if (!picat_is_float(x2)){
+      return PICAT_FALSE;
+    } else {
+      cx2 = picat_get_float(x2); 
+    }
+  } else {
+    int cX2int = picat_get_integer(x2);
+    cx2 = (float) cX2int;
   }
-  long cY1 = picat_get_integer(y1);
-  if(exception == NULL){
+  if(!picat_is_integer(fill)){
     return PICAT_FALSE;
   }
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc((int)cX1+ cX2/2,(int) cX2,(int) cY1 - cX2/2, (int)cX2, (int)cFill, 0, 360, Circle); 
+  assignArc((int)cx+ cx2/2,(int) cx2,(int) cy - cx2/2, (int)cx2, 0, 360, (int) cFill, Circle); 
   return PICAT_TRUE;
 }
 
@@ -377,26 +399,47 @@ c_line(){
   TERM y1 = picat_get_call_arg(2,4);
   TERM x2 = picat_get_call_arg(3,4);
   TERM y2 = picat_get_call_arg(4,4);
-  if(!picat_is_integer(x1) || !picat_is_integer(x2) || !picat_is_integer(y1) || !picat_is_integer(y2)){
-    return PICAT_FALSE;
+  int ix1 = 0;
+  int iy1 = 0;
+  int ix2 = 0;
+  int iy2 = 0;
+  if(!picat_is_integer(x1)){
+    if(!picat_is_float(x1)){
+      return PICAT_FALSE;
+    } else {
+      ix1 = (int) picat_get_float(x1);
+    }
+  } else {
+    ix1 = (int) picat_get_integer(x1);
   }
-  long cX1 = picat_get_integer(x1);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if(!picat_is_integer(y1)){
+    if(!picat_is_float(y1)){
+      return PICAT_FALSE;
+    } else {
+      iy1 = (int) picat_get_float(y1);
+    }
+  } else {
+    iy1 = (int) picat_get_integer(y1);
   }
-  long cX2 = picat_get_integer(x2);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if(!picat_is_integer(x2)){
+    if(!picat_is_float(x2)){
+      return PICAT_FALSE;
+    } else {
+      ix2 = (int) picat_get_float(x2);
+    }
+  } else {
+    ix2 = (int) picat_get_integer(x2);
   }
-  long cY1 = picat_get_integer(y1);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if(!picat_is_integer(y2)){
+    if(!picat_is_float(y2)){
+      return PICAT_FALSE;
+    } else {
+      iy2 = (int) picat_get_float(y2);
+    }
+  } else {
+    iy2 = (int) picat_get_integer(y2);
   }
-  long cY2 = picat_get_integer(y2);
-  if(exception == NULL){
-    return PICAT_FALSE;
-  }
-  assignLine((int)cX1,(int) cX2,(int) cY1, (int)cY2, Line); 
+  assignLine(ix1,ix2,iy1, iy2, Line); 
   return PICAT_TRUE;
 }
 
@@ -448,7 +491,6 @@ c_canvas()
 {
   TERM x = picat_get_call_arg(1,2);
   TERM y = picat_get_call_arg(2,2);
-
 
   if(!picat_is_integer(x) || !picat_is_integer(y)){
     return PICAT_FALSE;
