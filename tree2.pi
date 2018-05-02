@@ -1,11 +1,28 @@
 main =>
   bp.c_clearCanvas(),
   X = 200,
-  Y = 100,
-  Size = 40,
-  bp.c_circle( X/2 - Size/2, Y - Size / 2, Size, 0),
-  bp.c_line(X/2, Y - 3 * Size / 2, X / 4, Y - 80),
-  bp.c_line(X/2, Y - 3 * Size / 2, X * 3 / 4,Y - 80),
+  Y = 300,
+  Size = 10,
+  Margin = 10,
+  Line = 50,
+  Fill = 0,
+  N = 6,
+  %node(X/2, 0, Margin, Size, Line, Y, Fill),
+  bp.c_line(X/2, Y - Size - Margin, X / 4, Y - (Margin + Size +Line)),
+  bp.c_line(X/2, Y - Size - Margin, X * 3 / 4,Y - (Margin + Size +Line)),
+  vertex(X/2, 0, Margin, Size, Line, Y),
+  node( X / 4 , 1, Margin, Size, Line, Y, Fill), 
+  node(X * 3 / 4, 1, Margin,Size,Line, Y, Fill),
   bp.c_canvas(X,Y),
   bp.c_clearCanvas().
 
+
+vertex(LocX, Depth, Margin, Size, Line, Y)=>
+  CurY = Y - Margin - Size * (Depth * (Size + Line)),
+  bp.c_line(LocX, CurY, LocX/2, CurY -Line),
+  bp.c_line(LocX, CurY, LocX * 3/4, CurY - Line).
+
+node(LocX, Depth, Margin, Size, Line, Y, Fill) =>
+  Offset = Margin + (Depth * ( Size + Line)),
+  bp.c_circle(LocX - Size/2, Y - Offset, Size, Fill).
+  

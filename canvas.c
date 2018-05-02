@@ -112,9 +112,9 @@ int redraw_cb( Ihandle *self, float x, float y )
         break;
       case 0: ;
         struct Circles *circle = node->value;
-        if(circle->fill == 0)
+        if(circle->fill == 0){
           cdCanvasArc(cdcanvas, circle->x1, circle->y1, circle->x2, circle->y2, circle->angle1, circle->angle2);
-        else
+        }else
           cdCanvasSector(cdcanvas, circle->x1, circle->y1, circle->x2, circle->y2, circle->angle1,circle->angle2);
         break;
       case 2: ;
@@ -233,38 +233,73 @@ c_arc(){
   TERM angle1 	= picat_get_call_arg(5,7);
   TERM angle2	= picat_get_call_arg(6,7);
   TERM fill 	= picat_get_call_arg(7,7);
-  if(!picat_is_integer(x1) || !picat_is_integer(x2) || !picat_is_integer(y1) || !picat_is_integer(y2) || !picat_is_integer(angle1) || !picat_is_integer(angle2) || !picat_is_integer(fill)){
-    return PICAT_FALSE;
+  int ix1 = 0;
+  int iy1 = 0;
+  int ix2 = 0;
+  int iy2 = 0;
+  long cAngle1 = 0;
+  long cAngle2 = 0;
+  if(!picat_is_integer(x1)){
+    if(!picat_is_float(x1)){
+      return PICAT_FALSE;
+    } else {
+      ix1 = (int) picat_get_float(x1);
+    }
+  } else
+    ix1 = (int) picat_get_integer(x1);
+  if(!picat_is_integer(x2)){
+    if(!picat_is_float(x2)){
+      return PICAT_FALSE;
+    } else {
+      ix2 = (int) picat_get_float(x2);
+    }
+  } else {
+    ix2 = (int) picat_get_integer(x2);
   }
-  long cX1 = picat_get_integer(x1);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if(!picat_is_integer(y1)){
+    if(!picat_is_float(y1)){
+      return PICAT_FALSE;
+    } else {
+      iy1 = (int) picat_get_float(y1);
+    }
+  } else {
+    iy1 = (int) picat_get_integer(y1);
   }
-  long cX2 = picat_get_integer(x2);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if(!picat_is_integer(y2)){
+    if(!picat_is_float(y2)){
+      return PICAT_FALSE;
+    } else {
+      iy2 = (int) picat_get_float(y2);
+    }
+  } else {
+    iy2 = (int) picat_get_integer(y2);
   }
-  long cY1 = picat_get_integer(y1);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if(!picat_is_integer(angle1)){
+    if(!picat_is_float(angle1)){
+      return PICAT_FALSE;
+    } else {
+      cAngle1 = (long) picat_get_float(angle1);
+    }
+  } else {
+    cAngle1 = (long) picat_get_integer(angle1);
   }
-  long cY2 = picat_get_integer(y2);
-  if(exception == NULL){
-    return PICAT_FALSE;
+  if(!picat_is_integer(angle2)){
+    if(!picat_is_float(angle2)){
+      return PICAT_FALSE;
+    } else {
+      cAngle2 = (long) picat_get_float(angle2);
+    }
+  } else {
+    cAngle2 = (long) picat_get_integer(angle2);
   }
-  long cAngle1 = picat_get_integer(angle1);
-  if(exception == NULL){
-    return PICAT_FALSE;
-  }
-  long cAngle2 = picat_get_integer(angle2);
-  if(exception == NULL){
+  if(!picat_is_integer(fill)){
     return PICAT_FALSE;
   }
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc((int)cX1+cX2/2,(int) cX2,(int) cY1-cY2/2, (int)cY2, cAngle1, cAngle2, (int)cFill, Circle); 
+  assignArc(ix1 + ix2/2, ix2, iy1 - iy2/2, iy2, cAngle1, cAngle2, (int)cFill, Circle); 
   return PICAT_TRUE;
 }
 
@@ -608,7 +643,7 @@ c_canvas()
   int *width = malloc(sizeof(int));
   int *height = malloc(sizeof(int));
   cdCanvasGetSize(cdcanvas, width, height, NULL, NULL);
-  printf("height %d %d", *width, *height);   
+  //printf("height %d %d", *width, *height);   
   IupShowXY( dlg, IUP_CENTER, IUP_CENTER );
   IupMainLoop();
   IupClose();  
