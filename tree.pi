@@ -1,0 +1,38 @@
+import cg.
+
+main =>
+    N=6, %depth of the tree
+    generateTree(Tree,N,Os,[],Ls,[]),
+    tree(Tree,top_down,0,4,centered),
+    show(Os), % packs the nodes
+    show(Ls), % shows lines first
+    bp.c_canvas(400,100).
+
+generateTree(Tree,0,Os,OsR,Ls,LsR) =>
+    node(C),
+    Tree = $node(C,[]),
+    Os = [C|OsR],
+    Ls = LsR.
+generateTree(Tree,N,Os,OsR,Ls,LsR) =>
+    node(Root),
+    Tree = $node(Root,[C1,C2]),
+    N1 is N-1,
+    L1 = new_line(),
+    L2 = new_line(),
+    Ls = [L1,L2|Ls1],
+    generateTree(C1,N1,Os,Os1,Ls1,Ls2),
+    generateTree(C2,N1,Os1,OsR,Ls2,LsR),
+    C1 = $node(Circle1,_),
+    C2 = $node(Circle2,_),
+    L1.point1 = Root.centerPoint,
+    L1.point2 = Circle1.centerPoint,
+    L2.point1 = L1.point1,
+    L2.point2 = Circle2.centerPoint.
+
+node(C) =>
+    C = new_circle(),
+    C.color = red,
+    C.width = 5.
+
+
+

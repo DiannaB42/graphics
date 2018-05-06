@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <iup/iup.h>
@@ -102,39 +103,44 @@ int redraw_cb( Ihandle *self, float x, float y )
   cdCanvasActivate(cdcanvas);
   cdCanvasClear(cdcanvas);
   cdCanvasForeground(cdcanvas, CD_RED);
-
+  
+  int *height = malloc(sizeof(int));
+  cdCanvasGetSize(cdcanvas, NULL, height, NULL, NULL);
   struct Drawing* node = drawings;
   while(node != NULL){
     switch(node->type){
       case 1: ;
-        struct Lines *line = node->value; 
-        cdCanvasLine(cdcanvas, line->x1, line->y1, line->x2, line->y2);
+        struct Lines *line = node->value;
+        //printf(" line x1 y1 x2 y2 %d %d %d %d %li\n",line->x1,line->y1, line->x2, line->y2, *height); 
+        cdCanvasLine(cdcanvas, line->x1, *height - line->y1, line->x2, *height - line->y2);
         break;
       case 0: ;
         struct Circles *circle = node->value;
         if(circle->fill == 0){
-          cdCanvasArc(cdcanvas, circle->x1, circle->y1, circle->x2, circle->y2, circle->angle1, circle->angle2);
+          cdCanvasArc(cdcanvas, circle->x1, *height - circle->y1, circle->x2,circle->y2, circle->angle1, circle->angle2);
         }else
-          cdCanvasSector(cdcanvas, circle->x1, circle->y1, circle->x2, circle->y2, circle->angle1,circle->angle2);
+          cdCanvasSector(cdcanvas, circle->x1, *height - circle->y1, circle->x2, circle->y2, circle->angle1,circle->angle2);
         break;
       case 2: ;
         struct Rects *rect = node->value;
         if(rect->fill == 0){
-          cdCanvasRect(cdcanvas, rect->x1, rect->x2, rect->y1, rect->y2);
+          cdCanvasRect(cdcanvas, rect->x1, rect->x2, *height - rect->y1, *height - rect->y2);
         } else {
-          cdCanvasBox(cdcanvas, rect->x1, rect->x2, rect->y1, rect->y2);
+          cdCanvasBox(cdcanvas, rect->x1, rect->x2, *height - rect->y1, *height - rect->y2);
         }
         break;
       case 3: ;
         struct Triangles *tri = node->value;
         cdCanvasBegin(cdcanvas, CD_CLOSED_LINES);
-        cdCanvasVertex(cdcanvas, tri->x1, tri->y1);
-        cdCanvasVertex(cdcanvas, tri->x2, tri->y2);
-        cdCanvasVertex(cdcanvas, tri->x3, tri->y3);
+        cdCanvasVertex(cdcanvas, tri->x1, *height - tri->y1);
+        cdCanvasVertex(cdcanvas, tri->x2, *height - tri->y2);
+        cdCanvasVertex(cdcanvas, tri->x3, *height - tri->y3);
         cdCanvasEnd(cdcanvas);
     }
     node = node->next;  
   }
+
+  free(height);
   //clearList();
   return IUP_DEFAULT;
 }
@@ -437,7 +443,7 @@ c_oval(){
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc(ix1 + ix2/2, ix2, iy1 - iy2/2, iy2, 0, 360, (int) cFill, Circle);
+  assignArc(ix1 + ix2/2, ix2, iy1 + iy2/2, iy2, 0, 360, (int) cFill, Circle);
   return PICAT_TRUE;
 }
 
@@ -489,7 +495,7 @@ c_circle(){
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc((int)cx+ cx2/2,(int) cx2,(int) cy - cx2/2, (int)cx2, 0, 360, (int) cFill, Circle); 
+  assignArc((int)cx+ cx2/2,(int) cx2,(int) cy + cx2/2, (int)cx2, 0, 360, (int) cFill, Circle); 
   return PICAT_TRUE;
 }
 
@@ -640,9 +646,9 @@ c_canvas()
 
   cdcanvas = cdCreateCanvas( CD_IUP, cnvs );
   cdCanvasSetAttribute(cdcanvas, "ANTIALIAS", "0");
-  int *width = malloc(sizeof(int));
-  int *height = malloc(sizeof(int));
-  cdCanvasGetSize(cdcanvas, width, height, NULL, NULL);
+  //int *width = malloc(sizeof(int));
+  //int *height = malloc(sizeof(int));
+  //cdCanvasGetSize(cdcanvas, width, height, NULL, NULL);
   //printf("height %d %d", *width, *height);   
   IupShowXY( dlg, IUP_CENTER, IUP_CENTER );
   IupMainLoop();
