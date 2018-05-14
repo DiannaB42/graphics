@@ -6,7 +6,7 @@ main =>
     tree(Tree,top_down,0,4,centered),
     show(Os), % packs the nodes
     show(Ls), % shows lines first
-    bp.c_canvas(400,100).
+    bp.c_canvas(500,200).
 
 generateTree(Tree,0,Os,OsR,Ls,LsR) =>
     node(C),
@@ -20,8 +20,9 @@ generateTree(Tree,N,Os,OsR,Ls,LsR) =>
     L1 = new_line(),
     L2 = new_line(),
     Ls = [L1,L2|Ls1],
-    generateTree(C1,N1,Os,Os1,Ls1,Ls2),
-    generateTree(C2,N1,Os1,OsR,Ls2,LsR),
+    Os = [Root|Os1],
+    generateTree(C1,N1,Os1,Os2,Ls1,Ls2),
+    generateTree(C2,N1,Os2,OsR,Ls2,LsR),
     C1 = $node(Circle1,_),
     C2 = $node(Circle2,_),
     L1.point1 = Root.centerPoint,
