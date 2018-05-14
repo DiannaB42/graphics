@@ -237,6 +237,11 @@ point3('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,X3,Y3,_Fill)) = $point(X3,Y3).
 n('_Polygon'(_Component,N,_Xs,_Ys,_Fill)) = N.
 n('_Star'(_Component,N,_CenterX,_CenterY,_Angle,_InnerDiameter,_Fill)) = N.
 
+fill('_Polygon'(_Component,_N,_Xs,_Ys,Fill)) = Fill.
+fill('_Star'(_Component,_N,_CenterX,_CenterY,_Angle,_InnerDiameter,Fill)) = Fill.
+fill('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,_X3,_Y3,Fill)) = Fill.
+fill('_Rectangle'(_Component,Fill)) = Fill.
+fill('_Circle'(_Componenet,Fill)) = Fill.
 
 diameter('_Circle'(Component,_Fill)) = Diameter =>
     Diameter = Component.width.
@@ -839,7 +844,8 @@ c_show('_Polygon'(_Component,N,Xs,Ys,Fill)) =>
     println($polygon(N,Xs,Ys,Fill)).
 c_show('_Rectangle'(Component,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($rectangle(X,Y,W,H,Fill)).
+    println($rectangle(X,Y,W,H,Fill)),
+    bp.c_rectangle(X,Y,W,H,Fill).
 c_show('_RoundRectangle'(Component,ArcWidth,ArcHeight,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
     println($roundRectangle(X,Y,W,H,ArcWidth,ArcHeight,Fill)).
@@ -848,7 +854,8 @@ c_show('_Square'(Component,Fill)) =>
     println($square(X,Y,W,H,Fill)).
 c_show('_Star'(Component,N,CenterX,CenterY,Angle,InnerDiameter,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Fill)).
+    println($star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Fill)),
+    bp.c_star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Fill).
 c_show('_TextBox'(Component,Text,Alignment)) =>
     getComponentBound(Component,X,Y,W,H),
     println($textBox(X,Y,W,H,Text,Alignment)).

@@ -1096,7 +1096,7 @@ void Cboot() {
     extern int c_rectangle();
     insert_cpred("c_rectangle", 5, c_rectangle);
     extern int c_star();
-    insert_cpred("c_star", 6, c_star);
+    insert_cpred("c_star", 10, c_star);
 
     insert_cpred("c_COPY_TERM",2,c_COPY_TERM);
     insert_cpred("c_DECREMENTARG",2,c_DECREMENTARG);

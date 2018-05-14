@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <iup/iup.h>
 #include <cd/cd.h>
@@ -9,7 +10,7 @@
 
 static cdCanvas *cdcanvas = NULL;
 
-typedef enum  {Circle, Line, Rect, Triangle, Component}TagType;
+typedef enum  {Circle, Line, Rect, Triangle, Polygon, Component}TagType;
 
 struct Lines{
   int x1;
@@ -51,6 +52,17 @@ struct Circles{
   int fill;
 };
 
+struct Vertex{
+  int x;
+  int y;
+  struct Vertex* next;
+};
+
+struct Polygons{
+  int fill;
+  struct Vertex* vertices; 
+};
+
 struct Drawing {
   TagType type;
   void* value;
@@ -88,8 +100,20 @@ void insertEnd(void* nextNode, TagType type){
 void clearList(){
   struct Drawing* node = drawings; 
   struct Drawing* next;
+  struct Vertex* cur;
+  struct Vertex* nextVer;
+  struct Polygons* poly;
   while(node != NULL){
     next = node->next;
+    if(node->type == 4){
+      poly = node->value;
+      cur = poly->vertices;
+      while(cur!= NULL){
+        nextVer = cur->next;
+	free(cur);
+        cur = nextVer;
+      }
+    }
     free(node->value);
     free(node);
     node = next;
@@ -136,6 +160,18 @@ int redraw_cb( Ihandle *self, float x, float y )
         cdCanvasVertex(cdcanvas, tri->x2, *height - tri->y2);
         cdCanvasVertex(cdcanvas, tri->x3, *height - tri->y3);
         cdCanvasEnd(cdcanvas);
+        break;
+      case 4: ;
+	struct Polygons* poly = node->value;
+        struct Vertex* vertex = poly->vertices;
+        cdCanvasBegin(cdcanvas, CD_CLOSED_LINES);
+        while(vertex != NULL){
+          //printf("x y for vertex %d %d\n", vertex->x, vertex->y);
+	  cdCanvasVertex(cdcanvas, vertex->x,*height - vertex->y);
+          vertex = vertex->next;
+        }
+        cdCanvasEnd(cdcanvas);
+	break;
     }
     node = node->next;  
   }
@@ -211,6 +247,50 @@ int assignArc(int x1, int x2, int y1, int y2, long angle1, long angle2, int fill
     circle->fill = getFill(fill);
     insertEnd(circle, type); 
   }
+}
+
+void assignStar(int x, int y,int w,int h,int n, int centerX,int centerY, int angle,int diameter, int fill){
+  struct Polygons* polygon;  
+  struct Vertex* vertex;
+  struct Vertex* next;
+  polygon = (struct Polygons*) malloc(sizeof(struct Polygons));
+  polygon->fill = getFill(fill);
+  int arc = 360 / n;
+  int alpha = 90 - arc + angle;
+  if(alpha<0) alpha += 360;
+  int angle1 = alpha + arc / 2;
+  int angle2 = alpha + arc;
+  for(int i = 0; i < n; i++){
+    angle1 = (angle1 >=360 ? angle1-360 : angle1);
+    angle2 = (angle2 >=360 ? angle2-360 : angle2);
+    double rad1 = ((double)angle1/180.0)*M_PI;
+    double rad2 = ((double)angle2/180.0)*M_PI;
+    int sx = (int)(centerX-(diameter/2)*cos(rad1));
+    int sy = (int)(centerY-(diameter/2)*sin(rad1));
+    int lx = (int)(centerX-(h/2)*cos(rad2));
+    int ly = (int)(centerY-(h/2)*sin(rad2));
+    //printf("Small vertex %d %d\nLarge %d %d", sx, sy, lx, ly);
+    vertex = (struct Vertex*) malloc(sizeof(struct Vertex));
+    if( i == 0){
+      polygon->vertices = vertex;
+    } else {
+      next->next = vertex;
+    }
+    next = (struct Vertex*) malloc(sizeof(struct Vertex));
+    if(vertex == NULL|| next == NULL){
+      printf("Error: Out of Memory\n");
+      exit(1);
+    }
+    vertex->x = sx;
+    vertex->y = sy;
+    vertex->next = next;
+    next->x = lx;
+    next->y = ly;
+    angle1 += arc;
+    angle2 += arc;
+    next->next = NULL;
+  }
+  insertEnd(polygon, Polygon);
 }
 
 int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType type){
@@ -607,13 +687,36 @@ c_rectangle(){
 
 
 c_star(){
-  TERM n = picat_get_call_arg(1,6);
-  TERM x = picat_get_call_arg(2,6);
-  TERM y = picat_get_call_arg(3,6);
-  TERM angle = picat_get_call_arg(4,6);
-  TERM diameter = picat_get_call_arg(5,6);
-  TERM fill = picat_get_call_arg(6,6);
+  TERM x = 		picat_get_call_arg(1,10);
+  TERM y = 		picat_get_call_arg(2,10);
+  TERM w = 		picat_get_call_arg(3,10);
+  TERM h = 		picat_get_call_arg(4,10);
+  TERM n = 		picat_get_call_arg(5,10);
+  TERM centerX = 	picat_get_call_arg(6,10);
+  TERM centerY = 	picat_get_call_arg(7,10);
+  TERM angle = 		picat_get_call_arg(8,10);
+  TERM diameter = 	picat_get_call_arg(9,10);
+  TERM fill = 		picat_get_call_arg(10,10);
 
+  if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(n) || !picat_is_integer(centerX) ||!picat_is_integer(centerY) || !picat_is_integer(angle) || !picat_is_integer(diameter) || !picat_is_integer(fill))
+    return PICAT_FALSE;
+  long cx = picat_get_integer(x);
+  long cy = picat_get_integer(y);
+  long cw = picat_get_integer(w);
+  long ch = picat_get_integer(h);
+  long cn = picat_get_integer(n);
+  long cCenterX = picat_get_integer(centerX);
+  long cCenterY = picat_get_integer(centerY);
+  long cAngle = picat_get_integer(angle);
+  long cDiameter = picat_get_integer(diameter);
+  long cFill = picat_get_integer(fill);
+
+  if(exception == NULL){
+    return PICAT_FALSE;
+  }
+
+  assignStar(cx,cy,cw,ch,cn,cCenterX, cCenterY,cAngle,cDiameter, cFill);
+  return PICAT_TRUE;
 }
 
 
