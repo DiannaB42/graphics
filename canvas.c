@@ -325,62 +325,16 @@ c_arc(){
   int iy2 = 0;
   long cAngle1 = 0;
   long cAngle2 = 0;
-  if(!picat_is_integer(x1)){
-    if(!picat_is_float(x1)){
-      return PICAT_FALSE;
-    } else {
-      ix1 = (int) picat_get_float(x1);
-    }
-  } else
-    ix1 = (int) picat_get_integer(x1);
-  if(!picat_is_integer(x2)){
-    if(!picat_is_float(x2)){
-      return PICAT_FALSE;
-    } else {
-      ix2 = (int) picat_get_float(x2);
-    }
-  } else {
-    ix2 = (int) picat_get_integer(x2);
-  }
-  if(!picat_is_integer(y1)){
-    if(!picat_is_float(y1)){
-      return PICAT_FALSE;
-    } else {
-      iy1 = (int) picat_get_float(y1);
-    }
-  } else {
-    iy1 = (int) picat_get_integer(y1);
-  }
-  if(!picat_is_integer(y2)){
-    if(!picat_is_float(y2)){
-      return PICAT_FALSE;
-    } else {
-      iy2 = (int) picat_get_float(y2);
-    }
-  } else {
-    iy2 = (int) picat_get_integer(y2);
-  }
-  if(!picat_is_integer(angle1)){
-    if(!picat_is_float(angle1)){
-      return PICAT_FALSE;
-    } else {
-      cAngle1 = (long) picat_get_float(angle1);
-    }
-  } else {
-    cAngle1 = (long) picat_get_integer(angle1);
-  }
-  if(!picat_is_integer(angle2)){
-    if(!picat_is_float(angle2)){
-      return PICAT_FALSE;
-    } else {
-      cAngle2 = (long) picat_get_float(angle2);
-    }
-  } else {
-    cAngle2 = (long) picat_get_integer(angle2);
-  }
-  if(!picat_is_integer(fill)){
+  if(!picat_is_integer(x1) || !picat_is_integer(y1) || !picat_is_integer(x2) || !picat_is_integer(y2) || !picat_is_integer(angle1) || !picat_is_integer(angle2) || !picat_is_integer(fill)){
     return PICAT_FALSE;
   }
+  
+  ix1 = (int) picat_get_integer(x1);
+  ix2 = (int) picat_get_integer(x2);
+  iy1 = (int) picat_get_integer(y1);
+  iy2 = (int) picat_get_integer(y2);
+  cAngle1 = picat_get_integer(angle1);
+  cAngle2 = (long) picat_get_integer(angle2);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
@@ -403,63 +357,15 @@ c_triangle(){
   int iy1 = 0;
   int iy2 = 0;
   int iy3 = 0;
-  if(!picat_is_integer(x1)){
-    if(!picat_is_float(x1)){
-      return PICAT_FALSE;
-    } else {
-      ix1 = (int) picat_get_float(x1);
-    }
-  } else {
-    ix1 = (int) picat_get_integer(x1);
+  if(!picat_is_integer(x1) || !picat_is_integer(y1)|| !picat_is_integer(x2) || !picat_is_integer(y2)||!picat_is_integer(x3) ||!picat_is_integer(y3)||!picat_is_integer(fill)){
+   return PICAT_FALSE;
   }
-  if(!picat_is_integer(x2)){
-    if(!picat_is_float(x2)){
-      return PICAT_FALSE;
-    } else {
-      ix2 = (int) picat_get_float(x2);
-    }
-  } else {
-    ix2 = (int) picat_get_integer(x2);
-  }
-  if(!picat_is_integer(x3)){
-    if(!picat_is_float(x3)){
-      return PICAT_FALSE;
-    } else {
- ix3 = (int) picat_get_float(x3);
-    }
-  } else {
-    ix3 = (int) picat_get_integer(x3);
-  }
-  if(!picat_is_integer(y1)){
-    if(!picat_is_float(y1)){
-      return PICAT_FALSE;
-    } else {
-      iy1 = (int) picat_get_float(y1);
-    }
-  } else {
-    iy1 = (int) picat_get_integer(y1);
-  }
-  if(!picat_is_integer(y2)){
-    if(!picat_is_float(y2)){
-      return PICAT_FALSE;
-    } else {
-      iy2 = (int) picat_get_float(y2);
-    }
-  } else {
-    iy2 = (int) picat_get_integer(y2);
-  }
-  if(!picat_is_integer(y3)){
-    if(!picat_is_float(y3)){
-      return PICAT_FALSE;
-    } else {
-      iy3 = (int) picat_get_float(y3);
-    }
-  } else {
-    iy3 = (int) picat_get_integer(y3);
-  }
-  if(!picat_is_integer(fill)){
-    return PICAT_FALSE;
-  }
+  ix1 = (int) picat_get_integer(x1);
+  ix2 = (int) picat_get_integer(x2);
+  ix3 = (int) picat_get_integer(x3);
+  iy1 = (int) picat_get_integer(y1);
+  iy2 = (int) picat_get_integer(y2);
+  iy3 = (int) picat_get_integer(y3);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
@@ -480,45 +386,13 @@ c_oval(){
   int ix2 = 0;
   int iy1 = 0;
   int iy2 = 0;
-  if(!picat_is_integer(x1)){
-    if(!picat_is_float(x1)){
-      return PICAT_FALSE;
-    } else {
-      ix1 = (int) picat_get_float(x1);
-    }
-  } else {
-    ix1 = (int) picat_get_integer(x1);
-  }
-  if(!picat_is_integer(x2)){
-    if(!picat_is_float(x2)){
-      return PICAT_FALSE;
-    } else {
-      ix2 = (int) picat_get_float(x2);
-    }
-  } else {
-    ix2 = (int) picat_get_integer(x2);
-  }
-  if(!picat_is_integer(y1)){
-    if(!picat_is_float(y1)){
-  return PICAT_FALSE;
-    } else {
-      iy1 = (int) picat_get_float(y1);
-    }
-  } else {
-    iy1 = (int) picat_get_integer(y1);
-  }
-  if( !picat_is_integer(y2)){
-    if( !picat_is_float(y2)){
-      return PICAT_FALSE;
-    } else {
-      iy2 = (int) picat_get_float(y2);
-    }
-  } else {
-    iy2 = (int) picat_get_integer(y2);
-  }
-  if( !picat_is_integer(fill)){
+  if(!picat_is_integer(x1)||!picat_is_integer(y1)||!picat_is_integer(x2)||!picat_is_integer(y2) || !picat_is_integer(fill)){
     return PICAT_FALSE;
   }
+  ix1 = (int) picat_get_integer(x1);
+  ix2 = (int) picat_get_float(x2);
+  iy1 = (int) picat_get_float(y1);
+  iy2 = (int) picat_get_integer(y2);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
@@ -534,43 +408,15 @@ c_circle(){
   TERM y1 = picat_get_call_arg(2,4);
   TERM x2 = picat_get_call_arg(3,4);
   TERM fill = picat_get_call_arg(4,4);
-  float cx = 0;
-  float cy = 0;
-  float cx2= 0;
-  if (!picat_is_integer(x1)){
-    if (!picat_is_float(x1)){
-      return PICAT_FALSE;
-    } else {
-      cx = picat_get_float(x1); 
-    }
-  } else {
-    int cXint = picat_get_integer(x1);
-    cx = (float) cXint;
+  int cx = 0;
+  int cy = 0;
+  int cx2= 0;
+  if (!picat_is_integer(x1)||!picat_is_integer(y1) ||!picat_is_integer(x2)|| !picat_is_integer(fill)){
+    return PICAT_FALSE;   
   }
-  if (!picat_is_integer(y1)){
-    if (!picat_is_float(y1)){
-      return PICAT_FALSE;
-    } else {
-      cy = picat_get_float(y1); 
-    }
-  } else {
-    int cYint = picat_get_integer(y1);
-    cy = (float) cYint;
-  }
-
-  if (!picat_is_integer(x2)){
-    if (!picat_is_float(x2)){
-      return PICAT_FALSE;
-    } else {
-      cx2 = picat_get_float(x2); 
-    }
-  } else {
-    int cX2int = picat_get_integer(x2);
-    cx2 = (float) cX2int;
-  }
-  if(!picat_is_integer(fill)){
-    return PICAT_FALSE;
-  }
+  cx  = (int) picat_get_integer(x1);
+  cy  = (int) picat_get_integer(y1);
+  cx2 = (int) picat_get_integer(x2);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
@@ -588,42 +434,13 @@ c_line(){
   int iy1 = 0;
   int ix2 = 0;
   int iy2 = 0;
-  if(!picat_is_integer(x1)){
-    if(!picat_is_float(x1)){
-      return PICAT_FALSE;
-    } else {
-      ix1 = (int) picat_get_float(x1);
-    }
-  } else {
-    ix1 = (int) picat_get_integer(x1);
+  if(!picat_is_integer(x1) ||!picat_is_integer(y1) ||!picat_is_integer(x2) ||!picat_is_integer(y2)){
+    return PICAT_FALSE;
   }
-  if(!picat_is_integer(y1)){
-    if(!picat_is_float(y1)){
-      return PICAT_FALSE;
-    } else {
-      iy1 = (int) picat_get_float(y1);
-    }
-  } else {
-    iy1 = (int) picat_get_integer(y1);
-  }
-  if(!picat_is_integer(x2)){
-    if(!picat_is_float(x2)){
-      return PICAT_FALSE;
-    } else {
-      ix2 = (int) picat_get_float(x2);
-    }
-  } else {
-    ix2 = (int) picat_get_integer(x2);
-  }
-  if(!picat_is_integer(y2)){
-    if(!picat_is_float(y2)){
-      return PICAT_FALSE;
-    } else {
-      iy2 = (int) picat_get_float(y2);
-    }
-  } else {
-    iy2 = (int) picat_get_integer(y2);
-  }
+  ix1 = (int) picat_get_integer(x1);
+  iy1 = (int) picat_get_integer(y1);
+  ix2 = (int) picat_get_integer(x2);
+  iy2 = (int) picat_get_integer(y2);
   assignLine(ix1,ix2,iy1, iy2, Line); 
   return PICAT_TRUE;
 }
@@ -638,45 +455,13 @@ c_rectangle(){
   int xHigh = 0;
   int yLow = 0;
   int yHigh = 0;
-  if(!picat_is_integer(xMin)){
-    if(!picat_is_float(xMin)){
-      return PICAT_FALSE;
-    } else {
-      xLow = (int) picat_get_float(xMin);
-    }
-  } else {
-    xLow = (int) picat_get_integer(xMin);
-  }
-  if( !picat_is_integer(xMax)){
-    if(!picat_is_float(xMax)){
-      return PICAT_FALSE;
-    } else {
-      xHigh = (int) picat_get_float(xMax);
-    }
-  } else {
-    xHigh = (int) picat_get_integer(xMax);
-  }
-  if( !picat_is_integer(yMin)){
-    if(!picat_is_float(yMin)){
-      return PICAT_FALSE;
-    } else {
-      yLow = (int) picat_get_float(yMin);
-    }
-  } else {
-    yLow =(int) picat_get_integer(yMin);
-  }
-  if(!picat_is_integer(yMax)){
-    if(!picat_is_float(yMax)){
-      return PICAT_FALSE;
-    } else {
-      yHigh = (int) picat_get_float(yMax);
-    }
-  } else {
-    yHigh = (int) picat_get_integer(yMax);
-  }
-  if( !picat_is_integer(fill)){
+  if(!picat_is_integer(xMin) ||!picat_is_integer(yMin) ||!picat_is_integer(xMax) ||!picat_is_integer(yMax)||!picat_is_integer(fill)){
     return PICAT_FALSE;
   }
+  xLow  = (int) picat_get_integer(xMin);
+  xHigh = (int) picat_get_integer(xMax);
+  yLow  = (int) picat_get_integer(yMin);
+  yHigh = (int) picat_get_integer(yMax);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
