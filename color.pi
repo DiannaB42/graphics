@@ -1,0 +1,7 @@
+main =>
+  bp.c_line(10,20,30,40,yellow),
+  bp.c_line(20,30,40,50,yellow),
+  bp.c_line(30,40,50,60,blue),
+  bp.c_rectangle(30,40,50,60,red, 1),
+  bp.c_triangle(100,100,150,150,100,150, black, 1),
+  bp.c_canvas(300,200).

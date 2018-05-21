@@ -10,19 +10,13 @@
 
 static cdCanvas *cdcanvas = NULL;
 
-typedef enum  {Circle, Line, Rect, Triangle, Polygon, Component}TagType;
+typedef enum  {Circle, Line, Rect, Triangle, Polygon}TagType;
 
 struct Lines{
   int x1;
   int x2;
   int y1;
   int y2;
-};
-
-struct LineCom{
-  int color;
-  int width;
-  int style;
 };
 
 struct Rects{
@@ -66,12 +60,46 @@ struct Polygons{
 struct Drawing {
   TagType type;
   void* value;
+  int color;
   struct Drawing* next;
 };
 
 static struct Drawing* drawings = NULL;
 static struct Drawing* last = NULL;
 static char canvasSize[100];
+static int curColor = 1;
+
+void setColor(int color){
+  switch(color){
+    case 1:
+      cdCanvasForeground(cdcanvas, CD_RED);
+      break;
+    case 2:
+      cdCanvasForeground(cdcanvas, CD_DARK_RED);
+      break;
+    case 3:
+      cdCanvasForeground(cdcanvas, CD_YELLOW);
+      break;
+    case 4:
+      cdCanvasForeground(cdcanvas, CD_GREEN);
+      break;
+    case 5:
+      cdCanvasForeground(cdcanvas, CD_BLUE);
+      break;
+    case 6:
+      cdCanvasForeground(cdcanvas, CD_MAGENTA);
+      break;
+    case 7:
+      cdCanvasForeground(cdcanvas, CD_GRAY);
+      break;
+    case 8:
+      cdCanvasForeground(cdcanvas, CD_BLACK);
+      break;
+    case 9:
+      cdCanvasForeground(cdcanvas, CD_WHITE);
+      break;
+  }
+}
 
 
 void insertEnd(void* nextNode, TagType type){
@@ -83,6 +111,7 @@ void insertEnd(void* nextNode, TagType type){
   }
   draw->type = type;
   draw->value = nextNode;
+  draw->color = -1;
   draw->next = NULL;
 
   if(drawings == NULL){
@@ -97,6 +126,28 @@ void insertEnd(void* nextNode, TagType type){
   }
 } 
 
+void insertE(void* nextNode, TagType type, int color){
+  //create new node and assign data
+  struct Drawing* draw = (struct Drawing*) malloc(sizeof(struct Drawing));
+  if( draw == NULL){
+    printf("Error: Out of Memory");
+    exit(1);
+  }
+  draw->type = type;
+  draw->value = nextNode;
+  draw->color = color;
+  draw->next = NULL;
+  if(drawings == NULL){
+    //empty list
+    drawings = draw;
+    last = draw;
+  } else {
+    if(last != NULL){ 
+      last->next = draw;
+      last = draw;
+    }
+  }
+} 
 void clearList(){
   struct Drawing* node = drawings; 
   struct Drawing* next;
@@ -131,7 +182,12 @@ int redraw_cb( Ihandle *self, float x, float y )
   int *height = malloc(sizeof(int));
   cdCanvasGetSize(cdcanvas, NULL, height, NULL, NULL);
   struct Drawing* node = drawings;
+  curColor = 1;
   while(node != NULL){
+    if(node->color != curColor){
+      setColor(node->color);
+      curColor = node->color;
+    } 
     switch(node->type){
       case 1: ;
         struct Lines *line = node->value;
@@ -194,10 +250,40 @@ int getFill(int fill){
     return 0;
 }
 
-int assignShape(int x1, int x2, int y1, int y2, int fill, TagType type){
+int getColorValue(char* color){
+  if( strcmp(color, "red") == 0){
+    return 1;
+  }
+  if(strcmp(color, "dark red") == 0){
+    return 2;
+  }
+  if(strcmp(color, "yellow") == 0){
+    return 3;
+  }
+  if(strcmp(color, "green") == 0){
+    return 4;
+  }
+  if(strcmp(color, "blue") == 0){
+    return 5;
+  }
+  if(strcmp(color, "pink") == 0){
+    return 6;
+  }
+  if(strcmp(color, "grey") == 0|| strcmp(color, "gray") == 0){
+    return 7;
+  }
+  if(strcmp(color, "black") == 0){
+    return 8;
+  }
+  if(strcmp(color, "white") == 0){
+    return 9;
+  }
+}
+
+int assignRect(int x1, int x2, int y1, int y2, int color, int fill, TagType type){
   //Puts the variables into array holding shapes we want to draw
-  switch (type){
-    case 2: ;//Rectangle
+  if(type == 2){
+    //Rectangle
       struct Rects *rect;
       rect = (struct Rects*) malloc(sizeof(struct Rects));
       if(rect == NULL){
@@ -209,12 +295,16 @@ int assignShape(int x1, int x2, int y1, int y2, int fill, TagType type){
       rect->y1 = y1;
       rect->y2 = y2;
       rect->fill = getFill(fill);
-      insertEnd(rect, type);
-      break;
+      if( color != curColor && color != -1){
+        curColor = color;
+      } else {
+        color = -1;
+      }
+      insertE(rect, type, color);
   }
 }
 
-int assignLine(int x1, int x2, int y1, int y2, TagType type){
+int assignLine(int x1, int x2, int y1, int y2, TagType type, int color){
     if(type == 1){
       struct Lines *line;
       line = (struct Lines*) malloc(sizeof(struct Lines));
@@ -226,7 +316,12 @@ int assignLine(int x1, int x2, int y1, int y2, TagType type){
       line->x2 = x2;
       line->y1 = y1;
       line->y2 = y2;
-      insertEnd(line, type);
+      if( color != curColor && color != -1){
+        curColor = color;
+      } else {
+        color = -1;
+      }
+      insertE(line, type, color);
     } 
 }
 
@@ -293,7 +388,7 @@ void assignStar(int x, int y,int w,int h,int n, int centerX,int centerY, int ang
   insertEnd(polygon, Polygon);
 }
 
-int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType type){
+int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType type, int color){
   if(type == 3){
     struct Triangles* tri;
     tri = (struct Triangles*) malloc(sizeof(struct Triangles));
@@ -307,28 +402,90 @@ int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType 
     tri->y2 = y2;
     tri->x3 = x3;
     tri->y3 = y3;
-    insertEnd(tri, type);
+    if( color != curColor && color != -1){
+      curColor = color;
+    } else {
+      color = -1;
+    }
+    insertE(tri, type, color);
   }
 }
 
+void deletePoly(struct Polygons* poly){
+
+}
+
+int assignPoly(int n, TERM x,TERM y, int fill){
+  struct Polygons* poly;
+  struct Vertex* vertex;
+  struct Vertex* last;
+  TERM curX;
+  TERM curY;
+  TERM remX;
+  TERM remY;
+  int valX;
+  int valY;
+  poly = (struct Polygons*) malloc(sizeof(struct Polygons));
+  if(poly == NULL){
+    printf("Error: Out of Memory\n");
+    exit(1);
+  }
+  poly->fill = getFill(fill);
+  curX = x;
+  curY = y;
+  for(int i = 0; i < n; i++){
+    vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
+    vertex->next = NULL;
+    curX = picat_get_car(curX);
+    curY = picat_get_car(curY);
+    remX = picat_get_cdr(curX);
+    remY = picat_get_cdr(curY);
+    if(picat_is_nil(curX) || picat_is_nil(curY)||!picat_is_integer(curX) || !picat_is_integer(curY)){
+      deletePoly(poly);
+      free(vertex);
+      return 0;
+    } 
+    valX = (int) picat_get_integer(curX);
+    valY = (int) picat_get_integer(curY);
+    vertex->x = valX;
+    vertex->y = valY;
+    if( i == 0){
+      poly->vertices = vertex;
+    } else {
+      last->next = vertex;
+    }
+    last = vertex;
+    curX = remX;
+    curY = remY;
+  }
+  insertEnd(poly, Polygon);
+}
+
+
+
 c_arc(){
-  TERM x1 	= picat_get_call_arg(1,7);
-  TERM y1 	= picat_get_call_arg(2,7);
-  TERM x2 	= picat_get_call_arg(3,7);
-  TERM y2 	= picat_get_call_arg(4,7);
-  TERM angle1 	= picat_get_call_arg(5,7);
-  TERM angle2	= picat_get_call_arg(6,7);
-  TERM fill 	= picat_get_call_arg(7,7);
+  TERM x1 	= picat_get_call_arg(1,8);
+  TERM y1 	= picat_get_call_arg(2,8);
+  TERM x2 	= picat_get_call_arg(3,8);
+  TERM y2 	= picat_get_call_arg(4,8);
+  TERM color    = picat_get_call_arg(5,8);
+  TERM angle1 	= picat_get_call_arg(6,8);
+  TERM angle2	= picat_get_call_arg(7,8);
+  TERM fill 	= picat_get_call_arg(8,8);
   int ix1 = 0;
   int iy1 = 0;
   int ix2 = 0;
   int iy2 = 0;
   long cAngle1 = 0;
   long cAngle2 = 0;
+  char* buffer;
   if(!picat_is_integer(x1) || !picat_is_integer(y1) || !picat_is_integer(x2) || !picat_is_integer(y2) || !picat_is_integer(angle1) || !picat_is_integer(angle2) || !picat_is_integer(fill)){
     return PICAT_FALSE;
   }
-  
+  if(!picat_is_atom(color)){
+    return PICAT_FALSE;
+  }
+
   ix1 = (int) picat_get_integer(x1);
   ix2 = (int) picat_get_integer(x2);
   iy1 = (int) picat_get_integer(y1);
@@ -336,6 +493,7 @@ c_arc(){
   cAngle1 = picat_get_integer(angle1);
   cAngle2 = (long) picat_get_integer(angle2);
   long cFill = picat_get_integer(fill);
+  buffer = picat_get_atom_name(color);
   if(exception == NULL){
     return PICAT_FALSE;
   }
@@ -344,21 +502,28 @@ c_arc(){
 }
 
 c_triangle(){
-  TERM x1 	= picat_get_call_arg(1,7);
-  TERM y1 	= picat_get_call_arg(2,7);
-  TERM x2 	= picat_get_call_arg(3,7);
-  TERM y2 	= picat_get_call_arg(4,7);
-  TERM x3 	= picat_get_call_arg(5,7);
-  TERM y3	= picat_get_call_arg(6,7);
-  TERM fill 	= picat_get_call_arg(7,7);
+  TERM x1 	= picat_get_call_arg(1,8);
+  TERM y1 	= picat_get_call_arg(2,8);
+  TERM x2 	= picat_get_call_arg(3,8);
+  TERM y2 	= picat_get_call_arg(4,8);
+  TERM x3 	= picat_get_call_arg(5,8);
+  TERM y3	= picat_get_call_arg(6,8);
+  TERM color	= picat_get_call_arg(7,8);
+  TERM fill 	= picat_get_call_arg(8,8);
   int ix1 = 0;
   int ix2 = 0;
   int ix3 = 0;
   int iy1 = 0;
   int iy2 = 0;
   int iy3 = 0;
+  char* col;
   if(!picat_is_integer(x1) || !picat_is_integer(y1)|| !picat_is_integer(x2) || !picat_is_integer(y2)||!picat_is_integer(x3) ||!picat_is_integer(y3)||!picat_is_integer(fill)){
-   return PICAT_FALSE;
+    printf("Error: Expected interger value\n");
+    return PICAT_FALSE;
+  }
+  if(!picat_is_atom(color)){
+    printf("Error: Expected atom\n");
+    return PICAT_FALSE;
   }
   ix1 = (int) picat_get_integer(x1);
   ix2 = (int) picat_get_integer(x2);
@@ -366,11 +531,14 @@ c_triangle(){
   iy1 = (int) picat_get_integer(y1);
   iy2 = (int) picat_get_integer(y2);
   iy3 = (int) picat_get_integer(y3);
+  col = picat_get_atom_name(color);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
+    printf("Error: Exception encountered while converting terms\n");
     return PICAT_FALSE;
   }
-  assignTri(ix1, iy1, ix2, iy2, ix3, iy3, (int)cFill, Triangle);
+  int iColor = getColorValue(col);
+  assignTri(ix1, iy1, ix2, iy2, ix3, iy3, (int)cFill, Triangle, iColor);
   return PICAT_TRUE;
 }
 
@@ -426,36 +594,52 @@ c_circle(){
 }
 
 c_line(){
-  TERM x1 = picat_get_call_arg(1,4);
-  TERM y1 = picat_get_call_arg(2,4);
-  TERM x2 = picat_get_call_arg(3,4);
-  TERM y2 = picat_get_call_arg(4,4);
+  TERM x1 = picat_get_call_arg(1,5);
+  TERM y1 = picat_get_call_arg(2,5);
+  TERM x2 = picat_get_call_arg(3,5);
+  TERM y2 = picat_get_call_arg(4,5);
+  TERM color = picat_get_call_arg(5,5);
   int ix1 = 0;
   int iy1 = 0;
   int ix2 = 0;
   int iy2 = 0;
+  char* buffer;
+  int iColor;
   if(!picat_is_integer(x1) ||!picat_is_integer(y1) ||!picat_is_integer(x2) ||!picat_is_integer(y2)){
     return PICAT_FALSE;
   }
+  if(!picat_is_atom(color)){
+    return PICAT_FALSE;
+  }
+  
   ix1 = (int) picat_get_integer(x1);
   iy1 = (int) picat_get_integer(y1);
   ix2 = (int) picat_get_integer(x2);
   iy2 = (int) picat_get_integer(y2);
-  assignLine(ix1,ix2,iy1, iy2, Line); 
+  buffer = picat_get_atom_name(color);
+  iColor = getColorValue(buffer);
+  assignLine(ix1,ix2,iy1, iy2, Line, iColor); 
   return PICAT_TRUE;
 }
 
 c_rectangle(){
-  TERM xMin = picat_get_call_arg(1,5);
-  TERM yMin = picat_get_call_arg(2,5);
-  TERM xMax = picat_get_call_arg(3,5);
-  TERM yMax = picat_get_call_arg(4,5);
-  TERM fill = picat_get_call_arg(5,5);
+  TERM xMin = picat_get_call_arg(1,6);
+  TERM yMin = picat_get_call_arg(2,6);
+  TERM xMax = picat_get_call_arg(3,6);
+  TERM yMax = picat_get_call_arg(4,6);
+  TERM color = picat_get_call_arg(5,6);
+  TERM fill = picat_get_call_arg(6,6);
   int xLow = 0;
   int xHigh = 0;
   int yLow = 0;
   int yHigh = 0;
+  char* buffer;
   if(!picat_is_integer(xMin) ||!picat_is_integer(yMin) ||!picat_is_integer(xMax) ||!picat_is_integer(yMax)||!picat_is_integer(fill)){
+    printf("Error: Expected an integer value\n");
+    return PICAT_FALSE;
+  }
+  if(!picat_is_atom(color)){
+    printf("Error: Expected a string value\n");
     return PICAT_FALSE;
   }
   xLow  = (int) picat_get_integer(xMin);
@@ -463,10 +647,13 @@ c_rectangle(){
   yLow  = (int) picat_get_integer(yMin);
   yHigh = (int) picat_get_integer(yMax);
   long cFill = picat_get_integer(fill);
+  buffer = picat_get_atom_name(color);
   if(exception == NULL){
+    printf("Error: Exception encountered while converting terms\n");
     return PICAT_FALSE;
   }
-  assignShape(xLow, xHigh + xLow, yLow, yLow + yHigh, (int)cFill, Rect);
+  int iColor = getColorValue(buffer);
+  assignRect(xLow, xHigh + xLow, yLow, yLow + yHigh, iColor, (int)cFill, 2);
   return PICAT_TRUE;
 }
 
@@ -505,6 +692,23 @@ c_star(){
 }
 
 
+c_polygon(){
+  TERM n = picat_get_call_arg(1,4);
+  TERM x = picat_get_call_arg(2,4);
+  TERM y = picat_get_call_arg(3,4);
+  TERM fill = picat_get_call_arg(4,4);
+  if(!picat_is_integer(n) || !picat_is_integer(fill)){
+    return PICAT_FALSE;
+  }
+  if(!picat_is_list(x) ||!picat_is_list(y)){
+    return PICAT_FALSE;
+  }
+  int cn = (int) picat_get_integer(n);
+  int cFill = (int) picat_get_integer(fill);
+  assignPoly(cn, x, y, cFill);
+  return PICAT_TRUE;
+}
+
 c_canvas()
 {
   TERM x = picat_get_call_arg(1,2);
@@ -513,8 +717,8 @@ c_canvas()
   if(!picat_is_integer(x) || !picat_is_integer(y)){
     return PICAT_FALSE;
   }
-  long cX = (long) picat_get_integer(x) / 1.75;
-  long cY = (long) picat_get_integer(y) / 2.12;
+  long cX =  picat_get_integer(x) / 1.75;
+  long cY =  picat_get_integer(y) / 2.12;
 
   snprintf(canvasSize, 100, "%lix%li", cX, cY);
   Ihandle *dlg, *cnvs;
