@@ -1096,7 +1096,7 @@ void Cboot() {
     extern int c_rectangle();
     insert_cpred("c_rectangle", 6, c_rectangle);
     extern int c_star();
-    insert_cpred("c_star", 10, c_star);
+    insert_cpred("c_star", 11, c_star);
     extern int c_polygon();
     insert_cpred("c_polygon", 4, c_polygon);
 

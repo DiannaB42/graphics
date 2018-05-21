@@ -836,7 +836,7 @@ c_show('_Label'(Component,Text,Alignment)) =>
     println($label(X,Y,W,H,Text,Alignment)).
 c_show('_Line'(_Component,X1,Y1,X2,Y2,_Ext)) =>
     println($line(X1,Y1,X2,Y2)),
-    bp.c_line(X1,Y1,X2,Y2).
+    bp.c_line(X1,Y1,X2,Y2,Component.color).
 c_show('_Oval'(Component,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
     println($oval(X,Y,W,H,Fill)).
@@ -844,8 +844,8 @@ c_show('_Polygon'(_Component,N,Xs,Ys,Fill)) =>
     println($polygon(N,Xs,Ys,Fill)).
 c_show('_Rectangle'(Component,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($rectangle(X,Y,W,H,Fill)),
-    bp.c_rectangle(X,Y,W,H,Fill).
+    println($rectangle(X,Y,W,H,Component.color,Fill)),
+    bp.c_rectangle(X,Y,W,H,Component.color,Fill).
 c_show('_RoundRectangle'(Component,ArcWidth,ArcHeight,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
     println($roundRectangle(X,Y,W,H,ArcWidth,ArcHeight,Fill)).
@@ -854,13 +854,13 @@ c_show('_Square'(Component,Fill)) =>
     println($square(X,Y,W,H,Fill)).
 c_show('_Star'(Component,N,CenterX,CenterY,Angle,InnerDiameter,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Fill)),
-    bp.c_star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Fill).
+    println($star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Component.color,Fill)),
+    bp.c_star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Component.color,Fill).
 c_show('_TextBox'(Component,Text,Alignment)) =>
     getComponentBound(Component,X,Y,W,H),
     println($textBox(X,Y,W,H,Text,Alignment)).
 c_show('_Triangle'(_Component,X1,Y1,X2,Y2,X3,Y3,Fill)) =>
-    println($triangle(X1,Y1,X2,Y2,X3,Y3,Fill)).    
+    println($triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill)).    
 
 
 %%% utilities

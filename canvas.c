@@ -344,7 +344,7 @@ int assignArc(int x1, int x2, int y1, int y2, long angle1, long angle2, int fill
   }
 }
 
-void assignStar(int x, int y,int w,int h,int n, int centerX,int centerY, int angle,int diameter, int fill){
+void assignStar(int x, int y,int w,int h,int n, int centerX,int centerY, int angle,int diameter,int color, int fill){
   struct Polygons* polygon;  
   struct Vertex* vertex;
   struct Vertex* next;
@@ -385,7 +385,7 @@ void assignStar(int x, int y,int w,int h,int n, int centerX,int centerY, int ang
     angle2 += arc;
     next->next = NULL;
   }
-  insertEnd(polygon, Polygon);
+  insertE(polygon, Polygon, color);
 }
 
 int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType type, int color){
@@ -659,19 +659,26 @@ c_rectangle(){
 
 
 c_star(){
-  TERM x = 		picat_get_call_arg(1,10);
-  TERM y = 		picat_get_call_arg(2,10);
-  TERM w = 		picat_get_call_arg(3,10);
-  TERM h = 		picat_get_call_arg(4,10);
-  TERM n = 		picat_get_call_arg(5,10);
-  TERM centerX = 	picat_get_call_arg(6,10);
-  TERM centerY = 	picat_get_call_arg(7,10);
-  TERM angle = 		picat_get_call_arg(8,10);
-  TERM diameter = 	picat_get_call_arg(9,10);
-  TERM fill = 		picat_get_call_arg(10,10);
+  TERM x = 		picat_get_call_arg(1,11);
+  TERM y = 		picat_get_call_arg(2,11);
+  TERM w = 		picat_get_call_arg(3,11);
+  TERM h = 		picat_get_call_arg(4,11);
+  TERM n = 		picat_get_call_arg(5,11);
+  TERM centerX = 	picat_get_call_arg(6,11);
+  TERM centerY = 	picat_get_call_arg(7,11);
+  TERM angle = 		picat_get_call_arg(8,11);
+  TERM diameter = 	picat_get_call_arg(9,11);
+  TERM color =		picat_get_call_arg(10,11);
+  TERM fill = 		picat_get_call_arg(11,11);
 
-  if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(n) || !picat_is_integer(centerX) ||!picat_is_integer(centerY) || !picat_is_integer(angle) || !picat_is_integer(diameter) || !picat_is_integer(fill))
+  if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(n) || !picat_is_integer(centerX) ||!picat_is_integer(centerY) || !picat_is_integer(angle) || !picat_is_integer(diameter) || !picat_is_integer(fill)){
+    printf("Error: Integer Expected\n");
     return PICAT_FALSE;
+  }
+  if(!picat_is_atom(color)){
+    printf("Error: Atom Expected\n");
+    return PICAT_FALSE;
+  }
   long cx = picat_get_integer(x);
   long cy = picat_get_integer(y);
   long cw = picat_get_integer(w);
@@ -682,12 +689,14 @@ c_star(){
   long cAngle = picat_get_integer(angle);
   long cDiameter = picat_get_integer(diameter);
   long cFill = picat_get_integer(fill);
+  char* buffer = picat_get_atom_name(color);
 
   if(exception == NULL){
+    printf("Error: Exception encountered while converting terms\n");
     return PICAT_FALSE;
   }
-
-  assignStar(cx,cy,cw,ch,cn,cCenterX, cCenterY,cAngle,cDiameter, cFill);
+  int iColor = getColorValue(buffer);
+  assignStar(cx,cy,cw,ch,cn,cCenterX, cCenterY,cAngle,cDiameter,iColor, cFill);
   return PICAT_TRUE;
 }
 
