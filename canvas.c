@@ -325,7 +325,7 @@ int assignLine(int x1, int x2, int y1, int y2, TagType type, int color){
     } 
 }
 
-int assignArc(int x1, int x2, int y1, int y2, long angle1, long angle2, int fill, TagType type){
+int assignArc(int x1, int x2, int y1, int y2, long angle1, long angle2, int color, int fill, TagType type){
   if( type == 0){
     struct Circles *circle;
     circle = (struct Circles*) malloc(sizeof(struct Circles));
@@ -340,7 +340,7 @@ int assignArc(int x1, int x2, int y1, int y2, long angle1, long angle2, int fill
     circle->angle1 = angle1;
     circle->angle2 = angle2;
     circle->fill = getFill(fill);
-    insertEnd(circle, type); 
+    insertE(circle, type, color); 
   }
 }
 
@@ -415,7 +415,7 @@ void deletePoly(struct Polygons* poly){
 
 }
 
-int assignPoly(int n, TERM x,TERM y, int fill){
+int assignPoly(int n, TERM x, TERM y, int color, int fill){
   struct Polygons* poly;
   struct Vertex* vertex;
   struct Vertex* last;
@@ -458,7 +458,7 @@ int assignPoly(int n, TERM x,TERM y, int fill){
     curX = remX;
     curY = remY;
   }
-  insertEnd(poly, Polygon);
+  insertE(poly, Polygon, color);
 }
 
 
@@ -491,13 +491,14 @@ c_arc(){
   iy1 = (int) picat_get_integer(y1);
   iy2 = (int) picat_get_integer(y2);
   cAngle1 = picat_get_integer(angle1);
-  cAngle2 = (long) picat_get_integer(angle2);
+  cAngle2 = picat_get_integer(angle2);
   long cFill = picat_get_integer(fill);
   buffer = picat_get_atom_name(color);
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc(ix1 + ix2/2, ix2, iy1 - iy2/2, iy2, cAngle1, cAngle2, (int)cFill, Circle); 
+  int iColor = getColorValue(buffer);
+  assignArc(ix1 + ix2/2, ix2, iy1 + iy2/2, iy2, cAngle1, cAngle2,iColor, (int)cFill, Circle); 
   return PICAT_TRUE;
 }
 
@@ -545,51 +546,65 @@ c_triangle(){
 
 
 c_oval(){
-  TERM x1 = picat_get_call_arg(1,5);
-  TERM y1 = picat_get_call_arg(2,5);
-  TERM x2 = picat_get_call_arg(3,5);
-  TERM y2 = picat_get_call_arg(4,5);
-  TERM fill = picat_get_call_arg(5,5);
+  TERM x1 = picat_get_call_arg(1,6);
+  TERM y1 = picat_get_call_arg(2,6);
+  TERM x2 = picat_get_call_arg(3,6);
+  TERM y2 = picat_get_call_arg(4,6);
+  TERM color = picat_get_call_arg(5,6);
+  TERM fill = picat_get_call_arg(6,6);
   int ix1 = 0;
   int ix2 = 0;
   int iy1 = 0;
   int iy2 = 0;
+  char* buffer;
   if(!picat_is_integer(x1)||!picat_is_integer(y1)||!picat_is_integer(x2)||!picat_is_integer(y2) || !picat_is_integer(fill)){
+    return PICAT_FALSE;
+  }
+  if(!picat_is_atom(color)){
     return PICAT_FALSE;
   }
   ix1 = (int) picat_get_integer(x1);
   ix2 = (int) picat_get_float(x2);
   iy1 = (int) picat_get_float(y1);
   iy2 = (int) picat_get_integer(y2);
+  buffer = picat_get_atom_name(color);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc(ix1 + ix2/2, ix2, iy1 + iy2/2, iy2, 0, 360, (int) cFill, Circle);
+  int iColor = getColorValue(buffer);
+  assignArc(ix1 + ix2/2, ix2, iy1 + iy2/2, iy2, 0, 360, iColor, (int) cFill, Circle);
   return PICAT_TRUE;
 }
 
 
 
 c_circle(){
-  TERM x1 = picat_get_call_arg(1,4);
-  TERM y1 = picat_get_call_arg(2,4);
-  TERM x2 = picat_get_call_arg(3,4);
-  TERM fill = picat_get_call_arg(4,4);
+  TERM x1 = picat_get_call_arg(1,5);
+  TERM y1 = picat_get_call_arg(2,5);
+  TERM x2 = picat_get_call_arg(3,5);
+  TERM color = picat_get_call_arg(4,5);
+  TERM fill = picat_get_call_arg(5,5);
   int cx = 0;
   int cy = 0;
   int cx2= 0;
+  char* buffer;
   if (!picat_is_integer(x1)||!picat_is_integer(y1) ||!picat_is_integer(x2)|| !picat_is_integer(fill)){
     return PICAT_FALSE;   
+  }
+  if(!picat_is_atom(color)){
+    return PICAT_FALSE;
   }
   cx  = (int) picat_get_integer(x1);
   cy  = (int) picat_get_integer(y1);
   cx2 = (int) picat_get_integer(x2);
+  buffer = picat_get_atom_name(color);
   long cFill = picat_get_integer(fill);
   if(exception == NULL){
     return PICAT_FALSE;
   }
-  assignArc((int)cx+ cx2/2,(int) cx2,(int) cy + cx2/2, (int)cx2, 0, 360, (int) cFill, Circle); 
+  int iColor = getColorValue(buffer);
+  assignArc((int)cx+ cx2/2,(int) cx2,(int) cy + cx2/2, (int)cx2, 0, 360,iColor, (int) cFill, Circle); 
   return PICAT_TRUE;
 }
 
@@ -702,19 +717,33 @@ c_star(){
 
 
 c_polygon(){
-  TERM n = picat_get_call_arg(1,4);
-  TERM x = picat_get_call_arg(2,4);
-  TERM y = picat_get_call_arg(3,4);
-  TERM fill = picat_get_call_arg(4,4);
+  printf("Entering c_polygon\n");
+  TERM n = 	picat_get_call_arg(1,5);
+  TERM x = 	picat_get_call_arg(2,5);
+  TERM y = 	picat_get_call_arg(3,5);
+  TERM color = 	picat_get_call_arg(4,5);
+  TERM fill = 	picat_get_call_arg(5,5);
   if(!picat_is_integer(n) || !picat_is_integer(fill)){
+    printf("Error: Integer Expected\n");
     return PICAT_FALSE;
   }
   if(!picat_is_list(x) ||!picat_is_list(y)){
+    printf("Error: List Expected\n");
+    return PICAT_FALSE;
+  }
+  if(!picat_is_atom(color)){
+    printf("Error: Atom Expected\n");
     return PICAT_FALSE;
   }
   int cn = (int) picat_get_integer(n);
   int cFill = (int) picat_get_integer(fill);
-  assignPoly(cn, x, y, cFill);
+  char* buffer = picat_get_atom_name(color);
+  if(exception == NULL){
+    printf("Error: Exception encountered while converting terms\n");
+    return PICAT_FALSE;
+  }
+  int iColor = getColorValue(buffer);
+  assignPoly(cn, x, y, iColor, cFill);
   return PICAT_TRUE;
 }
 

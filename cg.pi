@@ -88,8 +88,8 @@ new_polygon(N) = Polygon, integer(N), N > 0 =>
     getComponentBound(Component,MinX,MinY,W,H),
      MaxX #= MinX+W,
      MaxY #= MinY+H,
-     Xs = new_array(N),
-     Ys = new_array(N),
+     Xs = new_list(N),
+     Ys = new_list(N),
      foreach ({X,Y} in zip(Xs,Ys))
          X #>= MinX, X #=< MaxX,
          Y #>= MinY, Y #=< MaxY
@@ -242,6 +242,11 @@ fill('_Star'(_Component,_N,_CenterX,_CenterY,_Angle,_InnerDiameter,Fill)) = Fill
 fill('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,_X3,_Y3,Fill)) = Fill.
 fill('_Rectangle'(_Component,Fill)) = Fill.
 fill('_Circle'(_Componenet,Fill)) = Fill.
+fill('_Oval'(_Componenet,Fill)) = Fill.
+fill('_Arc'(_Component,_StartAngle,_ArcAngle,Fill)) = Fill.
+
+startAngle('_Arc'(_Component,StartAngle,_ArcAngle,_Fill)) = StartAngle.
+arcAngle('_Arc'(_Component,_StartAngle,ArcAngle,_Fill)) = ArcAngle.
 
 diameter('_Circle'(Component,_Fill)) = Diameter =>
     Diameter = Component.width.
@@ -819,14 +824,15 @@ show(Comp),
 
 c_show('_Arc'(Component,StartAngle,ArcAngle,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($arc(X,Y,W,H,Component.color,StartAngle,ArcAngle,Fill)).
+    println($arc(X,Y,W,H,Component.color,StartAngle,ArcAngle,Fill)),
+    bp.c_arc(X,Y,W,H,Component.color,StartAngle,ArcAngle,Fill).
 c_show('_Button'(Component,Label,_Enabled)) =>
     getComponentBound(Component,X,Y,W,H),
     println($button(X,Y,W,H,label(Label))).
 c_show('_Circle'(Component,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($circle(X,Y,W,H,Fill)),
-    bp.c_circle(X,Y,W,Fill).
+    println($circle(X,Y,W,H,Component.color,Fill)),
+    bp.c_circle(X,Y,W,Component.color,Fill).
 c_show('_Image'(Component,_Id,Source)) =>
     getComponentBound(Component,X,Y,W,H),
     println($image(X,Y,W,H,Source)).
@@ -839,9 +845,11 @@ c_show('_Line'(_Component,X1,Y1,X2,Y2,_Ext)) =>
     bp.c_line(X1,Y1,X2,Y2,Component.color).
 c_show('_Oval'(Component,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($oval(X,Y,W,H,Fill)).
-c_show('_Polygon'(_Component,N,Xs,Ys,Fill)) =>
-    println($polygon(N,Xs,Ys,Fill)).
+    println($oval(X,Y,W,H,Component.color,Fill)),
+    bp.c_oval(X,Y,W,H,Component.color,Fill).
+c_show('_Polygon'(Component,N,Xs,Ys,Fill)) =>
+    println($polygon(N,Xs,Ys,Component.color,Fill)),
+    bp.c_polygon(N,Xs,Ys,Component.color,Fill).
 c_show('_Rectangle'(Component,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
     println($rectangle(X,Y,W,H,Component.color,Fill)),
@@ -860,7 +868,8 @@ c_show('_TextBox'(Component,Text,Alignment)) =>
     getComponentBound(Component,X,Y,W,H),
     println($textBox(X,Y,W,H,Text,Alignment)).
 c_show('_Triangle'(_Component,X1,Y1,X2,Y2,X3,Y3,Fill)) =>
-    println($triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill)).    
+    println($triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill)),
+    bp.c_triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill).    
 
 
 %%% utilities

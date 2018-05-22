@@ -1086,11 +1086,11 @@ void Cboot() {
     extern int c_line();
     insert_cpred("c_line", 5, c_line);
     extern int c_circle();
-    insert_cpred("c_circle", 4, c_circle);
+    insert_cpred("c_circle", 5, c_circle);
     extern int c_oval();
-    insert_cpred("c_oval", 5, c_oval);
+    insert_cpred("c_oval", 6, c_oval);
     extern int c_arc();
-    insert_cpred("c_arc", 7, c_arc);
+    insert_cpred("c_arc", 8, c_arc);
     extern int c_triangle();
     insert_cpred("c_triangle", 8, c_triangle);
     extern int c_rectangle();
@@ -1098,7 +1098,7 @@ void Cboot() {
     extern int c_star();
     insert_cpred("c_star", 11, c_star);
     extern int c_polygon();
-    insert_cpred("c_polygon", 4, c_polygon);
+    insert_cpred("c_polygon", 5, c_polygon);
 
     insert_cpred("c_COPY_TERM",2,c_COPY_TERM);
     insert_cpred("c_DECREMENTARG",2,c_DECREMENTARG);
