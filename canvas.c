@@ -220,9 +220,12 @@ int redraw_cb( Ihandle *self, float x, float y )
       case 4: ;
 	struct Polygons* poly = node->value;
         struct Vertex* vertex = poly->vertices;
-        cdCanvasBegin(cdcanvas, CD_CLOSED_LINES);
+        if(poly->fill == 0){
+          cdCanvasBegin(cdcanvas, CD_CLOSED_LINES);
+	} else {
+          cdCanvasBegin(cdcanvas, CD_FILL);
+        }
         while(vertex != NULL){
-          //printf("x y for vertex %d %d\n", vertex->x, vertex->y);
 	  cdCanvasVertex(cdcanvas, vertex->x,*height - vertex->y);
           vertex = vertex->next;
         }
@@ -436,17 +439,18 @@ int assignPoly(int n, TERM x, TERM y, int color, int fill){
   for(int i = 0; i < n; i++){
     vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
     vertex->next = NULL;
-    curX = picat_get_car(curX);
-    curY = picat_get_car(curY);
-    remX = picat_get_cdr(curX);
-    remY = picat_get_cdr(curY);
-    if(picat_is_nil(curX) || picat_is_nil(curY)||!picat_is_integer(curX) || !picat_is_integer(curY)){
+    curX = picat_get_car(x);
+    curY = picat_get_car(y);
+    x = picat_get_cdr(x);
+    y = picat_get_cdr(y);
+    if(!picat_is_integer(curX) || !picat_is_integer(curY)){
       deletePoly(poly);
       free(vertex);
       return 0;
     } 
     valX = (int) picat_get_integer(curX);
     valY = (int) picat_get_integer(curY);
+    //printf("Assigning vertex x %d y %d\n", valX, valY);
     vertex->x = valX;
     vertex->y = valY;
     if( i == 0){
@@ -455,8 +459,8 @@ int assignPoly(int n, TERM x, TERM y, int color, int fill){
       last->next = vertex;
     }
     last = vertex;
-    curX = remX;
-    curY = remY;
+    curX = x;
+    curY = y;
   }
   insertE(poly, Polygon, color);
 }
@@ -717,7 +721,6 @@ c_star(){
 
 
 c_polygon(){
-  printf("Entering c_polygon\n");
   TERM n = 	picat_get_call_arg(1,5);
   TERM x = 	picat_get_call_arg(2,5);
   TERM y = 	picat_get_call_arg(3,5);

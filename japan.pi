@@ -1,0 +1,32 @@
+import cg.
+
+go =>
+    japan(Os),
+    print("finished japan"),
+    show(Os),
+    bp.c_canvas(200,200).
+
+
+japan(Os)=>
+%japan([Flag,Frame,Sun])=>
+    Flag = new_rectangle(),
+    Flag.color = white,
+    Flag.width #> 200,
+    Frame = new_rectangle(),
+    Frame.color = black,
+    Frame.fill = 0,
+    %cgRectangle(Flag), Flag.color = white, Flag.width > 200,
+    %cgRectangle(Frame), Frame.color = black, Frame.fill = 0,
+    Sun = new_circle(),
+    Sun.color = red,
+
+    Frame.x #= Flag.x,
+    Frame.width #= Flag.width,
+    Frame.height #= Flag.height,
+    Sun.centerPoint #= Frame.centerPoint,
+    5*Flag.width #= 7*Flag.height,
+    7*Sun.width #= 3*Flag.height,
+    Os = [Flag,Frame, Sun].
+
+    %5*Flag.width #= 7*Flag.height.
+    %7*Sun.width #= 3*Flag.height.
