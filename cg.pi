@@ -237,6 +237,9 @@ point3('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,X3,Y3,_Fill)) = $point(X3,Y3).
 n('_Polygon'(_Component,N,_Xs,_Ys,_Fill)) = N.
 n('_Star'(_Component,N,_CenterX,_CenterY,_Angle,_InnerDiameter,_Fill)) = N.
 
+angle0('_Star'(_Component,_N,_CenterX,_CenterY,Angle,_InnerDiameter,_Fill)) = Angle.
+
+
 fill('_Polygon'(_Component,_N,_Xs,_Ys,Fill)) = Fill.
 fill('_Star'(_Component,_N,_CenterX,_CenterY,_Angle,_InnerDiameter,Fill)) = Fill.
 fill('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,_X3,_Y3,Fill)) = Fill.
@@ -247,6 +250,10 @@ fill('_Arc'(_Component,_StartAngle,_ArcAngle,Fill)) = Fill.
 
 startAngle('_Arc'(_Component,StartAngle,_ArcAngle,_Fill)) = StartAngle.
 arcAngle('_Arc'(_Component,_StartAngle,ArcAngle,_Fill)) = ArcAngle.
+
+xs('_Polygon'(_Component,_N,Xs,_Ys,_Fill)) = Xs.
+ys('_Polygon'(_Component,_N,_Xs,Ys,_Fill)) = Ys.
+
 
 diameter('_Circle'(Component,_Fill)) = Diameter =>
     Diameter = Component.width.
