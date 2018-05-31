@@ -874,7 +874,7 @@ c_show('_Star'(Component,N,CenterX,CenterY,Angle,InnerDiameter,Fill)) =>
 c_show('_TextBox'(Component,Text,Alignment)) =>
     getComponentBound(Component,X,Y,W,H),
     println($textBox(X,Y,W,H,Text,Alignment)).
-c_show('_Triangle'(_Component,X1,Y1,X2,Y2,X3,Y3,Fill)) =>
+c_show('_Triangle'(Component,X1,Y1,X2,Y2,X3,Y3,Fill)) =>
     println($triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill)),
     bp.c_triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill).    
 
