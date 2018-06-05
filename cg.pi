@@ -157,6 +157,7 @@ new_triangle = Triangle =>
 
 %%% functions for accessing attributes
 %
+
 x('_Component'(X,_Y,_W,_H,_Window,_Color,_PW,_PH,_No,_Handlers)) = X.
 x(Component) = X, cg_component(Component) =>
    X = x(Component[1]).
@@ -200,6 +201,10 @@ preferredHeight(Component) = PrefHeight, cg_component(Component) =>
     PrefHeight = preferredHeight(Component[1]).
 preferredHeight(Component) = _ =>
     handle_exception($cg_component_expected(Component),preferredHeight).
+
+
+h('_Window'(_X,_Y,_W,H,_Title,_LM,_TM,_MenuBar,_Enabled)) = H.
+w('_Window'(_X,_Y,W,_H,_Title,_LM,_TM,_MenuBar,_Enabled)) = W.
 
 
 % derived attributes
@@ -840,13 +845,15 @@ show(Comps@[_|_]),
     foreach(Comp in Comps)
         c_show(Comp),
         writeln(Comp)
-    end.
+    end,
+    bp.c_canvas(Win.w,Win.h).
 show(Comp),
     cg_component(Comp)
 =>
     Win = new_window(),
     cgPack([Comp],Win),
-    c_show(Comp).
+    c_show(Comp),
+    bp.c_canvas(Win.w,Win.h).
 
 c_show('_Arc'(Component,StartAngle,ArcAngle,Fill)) =>
     getComponentBound(Component,X,Y,W,H),

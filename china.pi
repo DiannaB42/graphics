@@ -1,0 +1,68 @@
+import cg.
+
+go =>
+   china().
+
+china() =>
+  china(Os),
+  show(Os).
+
+sameColor([]) => true.
+sameColor([_]) => true.
+sameColor([X,Y|L]) =>
+  X.color = Y.color,
+  sameColor([Y|L]).
+
+sameWidth([]) => true.
+sameWidth([_]) => true.
+sameWidth([X,Y|L]) =>
+  X.width = Y.width,
+  sameWidth([Y|L]).
+
+china(Os) =>
+  R = new_rectangle(),
+  R.color = red,
+
+  Stars =[S0,S1,S2,S3,S4],
+
+  S0 = new_star(5),
+  S1 = new_star(5),
+  S2 = new_star(5),
+  S3 = new_star(5),
+  S4 = new_star(5),
+  S0.color = yellow,
+  S1.color = yellow,
+  S2.color = yellow,
+  S3.color = yellow,
+  S4.color = yellow,
+  %sameColor(Stars),
+  sameWidth([S1,S2,S3,S4]),
+
+  2*R.width #= 3*R.height,
+  R.width #> 250,
+  R.width #< 500,
+
+  5*S0.diameter #= R.width,
+  3*S1.diameter #= S0.diameter,
+
+  5*(S0.centerX-R.x) #= R.width,
+  4*(S0.centerY-R.y) #= R.height,
+  S0.angle0 #= 90,
+
+  3*(S1.centerX-R.x) #= R.width,
+  10*(S1.centerY-R.y) #= R.height,
+  S1.angle0 #= 70,
+
+  25*(S2.centerX-R.x) #= 10*R.width,
+  5*(S2.centerY-R.y) #= R.height,
+  S2.angle0 #= 45,
+  
+  25*(S3.centerX-R.x) #= 10*R.width,
+  3*(S3.centerY-R.y) #= R.height,
+  S3.angle0 #= 90,
+
+  3*(S4.centerX-R.x) #= R.width,
+  21*(S4.centerY-R.y)#=< 10*R.height,
+  23*(S4.centerY-R.y) #> 10*R.height,
+  S4.angle0 #= 65,
+  Os = [R|Stars].

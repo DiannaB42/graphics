@@ -796,8 +796,8 @@ c_canvas()
   if(!picat_is_integer(x) || !picat_is_integer(y)){
     return PICAT_ERROR;
   }
-  long cX =  picat_get_integer(x) / 1.75;
-  long cY =  picat_get_integer(y) / 2.12;
+  long cX =(long)  picat_get_integer(x) / 1.75;
+  long cY =(long)  picat_get_integer(y) / 2.12;
 
   snprintf(canvasSize, 100, "%lix%li", cX, cY);
   Ihandle *dlg, *cnvs;

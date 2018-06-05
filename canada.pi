@@ -2,8 +2,8 @@ import cg.
 
 go =>
   canada(Os),
-  show(Os),
-  bp.c_canvas(200,300).
+  show(Os).
+
 
 canada(Os) =>
   R = new_rectangle(),

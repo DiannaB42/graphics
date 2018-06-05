@@ -2,8 +2,7 @@ import cg.
 
 go =>
   burundi(Os),
-  show(Os),
-  bp.c_canvas(300,200).
+  show(Os).
 
 burundi(Os) =>
   Frame = new_rectangle(),

@@ -3,9 +3,7 @@ import cg.
 % By Meng Chao(Jason) Chen
 go =>
     westernsahara(Os),
-    show(Os),
-    bp.c_canvas(300,200).
- 
+    show(Os). 
 
 westernsahara(Os) => 
   Frame = new_rectangle(),

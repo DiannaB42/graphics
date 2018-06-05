@@ -1,0 +1,45 @@
+import cg.
+
+go =>
+  antiguabarbuda.
+
+antiguabarbuda =>
+  antiguabarbuda(Os),
+  print("set up components"),
+  show(Os).
+
+antiguabarbuda(Os) =>
+  R = new_rectangle(),
+  R.color = red,
+  2*R.width #= 3*R.height,
+
+  TR1 = new_triangle(),
+  TR1.color = black,
+  TR1.point1 #= R.leftTopPoint,
+  TR1.point2 #= R.rightTopPoint,
+  TR1.x3 #= R.centerX,
+  TR1.y3 #= R.bottomY,
+
+  S = new_star(16),
+  S.color = yellow,
+  S.centerX #= R.x + R.width/2,
+  35*S.diameter #= 24*R.height,
+  7*S.innerDiameter #= 2*R.width,
+
+  TR2 = new_triangle(),
+  TR2.color = blue,
+  210*(TR2.x1-R.x) #= 41*R.width,
+  28*(TR2.y1-R.y) #= 11*R.height,
+  TR2.y1 #= S.centerY,
+  210*(TR2.x2-R.x) #= 169*R.width,
+  TR2.y2 #= TR2.y1,
+  TR2.point3 #= TR1.point3,
+
+  TR3 = new_triangle(),
+  TR3.color = white,
+  10*(TR3.x1-R.x) #= 3*R.width,
+  28*(TR3.y1-R.y) #= 17*R.height,
+  10*(TR3.x2-R.x) #= 7*R.width,
+  TR3.y2 #= TR3.y1,
+  TR3.point3 #= TR1.point3,
+  Os =[R,TR1,S,TR2,TR3].

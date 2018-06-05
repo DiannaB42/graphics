@@ -3,9 +3,7 @@ import cg.
 go =>
     japan(Os),
     print("finished japan"),
-    show(Os),
-    bp.c_canvas(200,200).
-
+    show(Os).
 
 japan(Os)=>
     Flag = new_rectangle(),
