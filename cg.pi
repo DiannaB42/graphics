@@ -33,6 +33,10 @@ import cp.
 
 %%% create graphical components
 %
+new_window = Window =>
+    Window = $'_Window'(X,Y,Width,Height,_Title,LM,TM,_MenuBar,_Enabled),    % LM -- left margin, TM -- top margin
+    [X,Y,Width,Height,LM,TM] :: 0..1000.
+
 new_component = Component =>
     nextInstanceNo(No),
     Component = $'_Component'(X,Y,Width,Height,_Window,_Color,_PW,_PH,No,_Handlers),
@@ -587,27 +591,39 @@ cgConstraintSameAttr(node(Box1,_Children1,_LC1,_RC1,_LM1,_RM1),Type,SameAttr),
 
 %%% Pack graphical objects to determine the attributes
 %
-cgPack(Comps),
-    cg_components(Comps)
-=>
-    once cgPackAux(Comps).
-cgPack(Comp),
-    cg_component(Comp)
-=>
-    once cgPackAux([Comp]).
-cgPack(Comps) =>
-    handle_exception($cg_components_expected(Comps),cgPack).
+cgPack(Comps,Win) =>
+    cgCompsInsideWindow(Comps,Win),
+    writeln(Win),
+    cgFixWindow(Win),
 
-cgPackAux(Comps) =>
+    writeln($'<=fix'(Win)),
+    foreach (Comp in Comps)
+        writeln(Comp)
+    end,
     cgPickupSizePosVars(Comps,WVars,HVars,XVars,YVars),
     cgInstantiateSizeVars(WVars),
     cgInstantiateSizeVars(HVars),
-%    writeln($xvars(XVars)),    
     cgInstantiatePosVars(XVars),
-%    writeln($yvars(YVars)),    
     cgInstantiatePosVars(YVars),
     %
     cgInstantiateComponents(Comps).
+
+cgCompsInsideWindow(Comps,'_Window'(_WinX,_WinY,WinWidth,WinHeight,_Title,LM,TM,_MenuBar,_Enabled)) =>
+    foreach (Comp in Comps)
+        getComponentBound(Comp,X,Y,W,H),
+        X #>= LM,
+        Y #>= TM,
+        X+W #=< WinWidth,
+        Y+H #=< WinHeight
+    end.
+
+cgFixWindow('_Window'(X,Y,W,H,_Title,LM,TM,_MenuBar,_Enabled)) =>
+    (var(X) -> X=0; true),
+    (var(Y) -> Y=0; true),
+    (var(W) -> cgInstantiateSizeVar($size(W,450)); true),
+    (var(H) -> cgInstantiateSizeVar($size(H,450)); true),
+    (var(LM) -> LM=0; true),
+    (var(TM) -> TM=0; true).
 
 cgPickupSizePosVars([],WVars,HVars,XVars,YVars) => WVars = [], HVars = [], XVars = [], YVars = [].
 cgPickupSizePosVars(['_Line'(_Component,X1,Y1,X2,Y2,_Ext)|Comps],WVars,HVars,XVars,YVars) =>
@@ -819,14 +835,17 @@ show([]) => true.
 show(Comps@[_|_]),
     cg_components(Comps)
 =>
-    cgPackAux(Comps),
+    Win = new_window(),
+    cgPack(Comps,Win),
     foreach(Comp in Comps)
-        c_show(Comp)
+        c_show(Comp),
+        writeln(Comp)
     end.
 show(Comp),
     cg_component(Comp)
 =>
-    cgPackAux([Comp]),
+    Win = new_window(),
+    cgPack([Comp],Win),
     c_show(Comp).
 
 c_show('_Arc'(Component,StartAngle,ArcAngle,Fill)) =>
@@ -847,7 +866,7 @@ c_show('_Label'(Component,Text,Alignment)) =>
     getComponentBound(Component,X,Y,W,H),
     (var(Alignment) -> Alignment = left; true),
     println($label(X,Y,W,H,Text,Alignment)).
-c_show('_Line'(_Component,X1,Y1,X2,Y2,_Ext)) =>
+c_show('_Line'(Component,X1,Y1,X2,Y2,_Ext)) =>
     println($line(X1,Y1,X2,Y2)),
     bp.c_line(X1,Y1,X2,Y2,Component.color).
 c_show('_Oval'(Component,Fill)) =>
@@ -951,3 +970,4 @@ indomain_dvar(V,Value) ?=>
 indomain_dvar(V,Value) =>
     Next = fd_next(V,Value),
     indomain_dvar(V,Next).
+

@@ -1,0 +1,61 @@
+import cg.
+
+% By Meng Chao(Jason) Chen
+go =>
+    westernsahara(Os),
+    show(Os),
+    bp.c_canvas(300,200).
+ 
+
+westernsahara(Os) => 
+  Frame = new_rectangle(),
+  Frame.fill #= 0,
+  Bg = new_rectangle(),
+  Frame.width #= Bg.width,
+  Frame.height #= Bg.height,
+  Bg.color #=white,
+  Bg.height #= 200,
+  Bg.width #= 9*Bg.height/5,
+
+  WhiteBox=[W1,W2],
+  W1 = new_rectangle(),
+  W2 = new_rectangle(),
+  W1.width #= Bg.width,
+  W2.width #= Bg.width,
+  W1.height #= W2.height,
+  W1.color #= black,
+  W2.color #= green,
+  W1.height #= Bg.height/3,  
+  W1.x #= Bg.x,
+  W1.y #= Bg.y,
+  W2.x #= Bg.x,
+  W2.y #= Bg.y + 2*Bg.height/3,
+
+  Wc = new_circle(),
+  Wc.color #= red,
+  Wc.width #= Bg.height/4,
+  Wc.x #= Bg.width/2,
+  Wc.centerY #= Bg.height//2,
+
+  Rc = new_circle(),
+  Rc.color #= white,
+  Rc.width #= 4*Wc.width/5,
+  Rc.x #= Wc.x + Bg.width//30,
+  Rc.y #= Wc.y + Bg.width//70,
+
+  Tri = new_triangle(),
+  Tri.color #=red,
+  Tri.point1 #= Bg.leftTopPoint,
+  Tri.point2 #= Bg.leftBottomPoint,
+  Tri.x3 #= Bg.x + Bg.width/3,
+  Tri.y3 #= Bg.y + Bg.height/2,
+
+
+  Star = new_star(5),
+  Star.color #= red,
+  Star.centerX #= Bg.x + 8*Bg.height/7,
+  Star.centerY #= Bg.centerY,
+  Star.diameter #= Bg.height/7,
+  Star.angle0 #= 75,
+  
+  Os=[Bg,W1,W2,Tri,Wc,Rc,Star,Frame].
