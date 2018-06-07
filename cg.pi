@@ -157,7 +157,6 @@ new_triangle = Triangle =>
 
 %%% functions for accessing attributes
 %
-
 x('_Component'(X,_Y,_W,_H,_Window,_Color,_PW,_PH,_No,_Handlers)) = X.
 x(Component) = X, cg_component(Component) =>
    X = x(Component[1]).
@@ -317,6 +316,8 @@ grid_array(Array,PadX,PadY),
     StartX #>= 0,
     StartY #>= 0,
     NoRows = len(Array),
+	NoCols = len(Array[1]),
+	writeln((NoRows,NoCols)),
     WVector = {GridWidth : _ in 1..NoRows},
     HVector = {GridHeight : _ in 1..NoCols},
     postTableRows(Array,1,NoRows,StartX,PadX,PadY,WVector,HVector),
@@ -331,6 +332,9 @@ grid_array(_Grid,PadX,PadY) =>
 
 %%%
 %
+tabular(Rows) =>
+    tabular(Rows,0,0).
+
 tabular(Rows,PadX,PadY),
     check_comps_list_list_to_array(Rows,Array)
 =>
@@ -353,6 +357,7 @@ tabular_array(Array,PadX,PadY),
     StartX #>= 0,
     StartY #>= 0,
     NoRows = len(Array),
+	NoCols = len(Array[1]),
     WVector = {_GridWidth : _ in 1..NoRows},
     HVector = {_GridHeight : _ in 1..NoCols},
     postTableRows(Array,1,NoRows,StartX,PadX,PadY,WVector,HVector),
@@ -364,16 +369,14 @@ tabular_array(_Grid,PadX,PadY) =>
         handle_exception($var_or_int_expected(PadX),tabular)
     ).
 
+postTableRows(_Array,N0,N,_StartX,_PadX,_PadY,_WVector,_HVector), N0 > N =>
+    true.
 postTableRows(Array,N0,N,StartX,PadX,PadY,WVector,HVector) =>
-    (N0>N ->
-        true
-    ;
-        Row = Array[N0],
-        NoCols = len(Row[1]),
-        N1 is N0+1,
-        postTableRowItems(Array,N0,1,NoCols,nil,0,StartX,PadX,PadX,WVector),
-        postTableRows(Array,N1,N,StartX,PadX,PadY,WVector,HVector)
-    ).
+    Row = Array[N0],
+    NoCols = len(Row),
+    N1 is N0+1,
+    postTableRowItems(Array,N0,1,NoCols,nil,0,StartX,PadX,PadX,WVector),
+    postTableRows(Array,N1,N,StartX,PadX,PadY,WVector,HVector).
 
 postTableRowItems(Array,RowNo,N0,N,PrevItem,PrevWidth,PrevX,PadX,TotalWidth,WVector) =>
     (N0>N ->
@@ -398,14 +401,11 @@ postTableRowItems(Array,RowNo,N0,N,PrevItem,PrevWidth,PrevX,PadX,TotalWidth,WVec
         postTableRowItems(Array,RowNo,N1,N,Item,NewPrevWidth,NewPrevX,PadX,NewTotalWidth,WVector)
     ).
 
+postTableColumns(_Array,N0,N,_NoRows,_StartY,_PadX,_PadY,_WVector,_HVector), N0 > N => true.
 postTableColumns(Array,N0,N,NoRows,StartY,PadX,PadY,WVector,HVector) =>
-    (N0 > N ->
-        true
-    ;
-        postTableColumn(Array,N0,1,NoRows,nil,0,StartY,PadY,PadY,HVector),
-        N1 is N0+1,
-        postTableColumns(Array,N1,N,NoRows,StartY,PadX,PadY,WVector,HVector)
-    ).
+    postTableColumn(Array,N0,1,NoRows,nil,0,StartY,PadY,PadY,HVector),
+    N1 is N0+1,
+    postTableColumns(Array,N1,N,NoRows,StartY,PadX,PadY,WVector,HVector).
     
 postTableColumn(Array,ColNo,RowNo0,RowNo,PrevItem,PrevHeight,PrevY,PadY,TotalHeight,HVector) =>
     (RowNo0 > RowNo ->
@@ -414,7 +414,6 @@ postTableColumn(Array,ColNo,RowNo0,RowNo,PrevItem,PrevHeight,PrevY,PadY,TotalHei
         Array[RowNo0] = Row,
         Row[ColNo] = Item,
         getComponentBound(Item,_X1,Y1,_Width1,Height1),
-        ColNo1 is ColNo+1,
         HVector[RowNo0] = RowHeight,
         (Item==PrevItem ->
             NewTotalHeight #= TotalHeight+RowHeight,
@@ -428,7 +427,7 @@ postTableColumn(Array,ColNo,RowNo0,RowNo,PrevItem,PrevHeight,PrevY,PadY,TotalHei
             NewPrevHeight = Height1
         ),
         RowNo1 is RowNo0+1,
-        postTableColumn(Array,ColNo1,RowNo1,RowNo,Item,NewPrevHeight,NewPrevY,PadY,NewTotalHeight,HVector)
+        postTableColumn(Array,ColNo,RowNo1,RowNo,Item,NewPrevHeight,NewPrevY,PadY,NewTotalHeight,HVector)
     ).
 
 /*********************************************************************************************
@@ -598,13 +597,7 @@ cgConstraintSameAttr(node(Box1,_Children1,_LC1,_RC1,_LM1,_RM1),Type,SameAttr),
 %
 cgPack(Comps,Win) =>
     cgCompsInsideWindow(Comps,Win),
-    writeln(Win),
     cgFixWindow(Win),
-
-    writeln($'<=fix'(Win)),
-    foreach (Comp in Comps)
-        writeln(Comp)
-    end,
     cgPickupSizePosVars(Comps,WVars,HVars,XVars,YVars),
     cgInstantiateSizeVars(WVars),
     cgInstantiateSizeVars(HVars),
