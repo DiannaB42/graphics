@@ -1,0 +1,88 @@
+/****************************************************************
+*   Constraint-based Graphical Programming in B-Prolog          *
+*   %                                                           *
+*   draw American, Italian, Polish, and Venezuelan flags        *
+*   %                                                           *
+*   CIS 719.3  Janusz A Skorwider                               *
+****************************************************************/
+import cg.
+go =>
+    venezuela(Os),
+    show(Os).
+
+venezuela(Os) =>
+  Flag = new_rectangle(),
+  Flag.color #= yellow,
+  3*Flag.height  #= 2*Flag.width,
+  Frame = new_rectangle(),
+  Frame.height #= Flag.height,
+  Frame.width #= Flag.width,
+  Frame.fill #= 0,
+  Frame.width #> 100,
+  Frame.width #<500,
+
+  BlueRec = new_rectangle(),
+  BlueRec.color #= blue,
+  BlueRec.width #= Flag.width,
+  BlueRec.height #= Flag.height/3,
+  BlueRec.x #= Flag.x,
+  BlueRec.y #= Flag.y+Flag.height/3,
+
+  RedRec = new_rectangle(),
+  RedRec.color #= red,
+  RedRec.width #= Flag.width,
+  RedRec.height #= Flag.height/3,
+  RedRec.x #= Flag.x,
+  RedRec.y #= Flag.y+Flag.height * 2/3,
+
+  Rc = new_circle(),
+  Rc.color #= blue,            %   just for setting the stars
+  Rc.width #= Flag.width//300, %3  in the right places
+  Rc.x #= Flag.width//2,       %3
+  12*Rc.y #= 5*Flag.height,
+
+  S0 = new_star(5),
+  S1 = new_star(5),
+  S2 = new_star(5),
+  S3 = new_star(5),
+  S4 = new_star(5),
+  S5 = new_star(5),
+  S6 = new_star(5),
+  S0.color = white,
+  S1.color = white,
+  S2.color = white,
+  S3.color = white,
+  S4.color = white,
+  S5.color = white,
+  S6.color = white,
+  S0.width #= Flag.width/18,
+  S1.width #= Flag.width/18,
+  S2.width #= Flag.width/18,
+  S3.width #= Flag.width/18,
+  S4.width #= Flag.width/18,
+  S5.width #= Flag.width/18,
+  S6.width #= Flag.width/18,
+
+  S0.centerX #= Rc.centerX,
+  14*S0.y #= 5*Flag.height-50,
+
+  13*S1.centerX #= 5*Flag.width+87,
+  27*S1.y #= 10*Flag.height,
+  
+  3*S2.centerX #= Flag.width+15,
+  54*S2.y #= 25*Flag.height,
+  
+  3*S3.centerX #= Flag.width,
+  54*S3.y #= 31*Flag.height,
+  
+  2*S4.centerX #= Flag.width+24, 
+  S4.y #= S1.y, 
+
+  3*S5.centerX #= 2*Flag.width-15,
+  S5.y #= S2.y,
+  
+  162*S6.centerX #= 111*Flag.width,
+  S6.y #= S3.y,
+
+  Os = [Flag,BlueRec,RedRec,Frame,Rc,S0,S1,S2,S3,S4,S5,S6].
+  %Os = [Flag,BlueRec,RedRec,Frame,Rc,S0,S1,S2,S3,S4,S5,S6].

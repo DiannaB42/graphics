@@ -5,8 +5,8 @@ main =>
     generateTree(Tree,N,Os,[],Ls,[]),
     tree(Tree,top_down,0,4,centered),
     show(Os), % packs the nodes
-    show(Ls), % shows lines first
-    bp.c_canvas(500,200).
+    show(Ls). % shows lines first
+
 
 generateTree(Tree,0,Os,OsR,Ls,LsR) =>
     node(C),

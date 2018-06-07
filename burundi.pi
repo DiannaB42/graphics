@@ -92,5 +92,5 @@ burundi(Os) =>
   Star6.centerY #= Bg.centerY + Bg.height/12,
   Star6.diameter #= Bg.height/9,
   
-  Os=[Bg,Frame,Tri1,Tri2,Tri3,Tri4,Wc,Star1,Star2,Star3,Star4,Star5,Star6].
+  Os=[Bg,Tri1,Tri2,Tri3,Tri4,Wc,Star1,Star2,Star3,Star4,Star5,Star6,Frame].
 

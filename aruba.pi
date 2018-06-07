@@ -1,0 +1,44 @@
+import cg.
+
+go =>
+  aruba(Os),
+  show(Os).
+
+aruba(Os) =>
+  Bl = new_rectangle(),
+  Bl.color = blue,
+  Bl.width #= 420,
+  13*Bl.width #= 21*Bl.height,
+
+  R1 = new_rectangle(),
+  R2 = new_rectangle(),
+  R1.color = yellow,
+  R2.color = yellow,
+  R2.width #= R1.width,
+  R2.height #= R1.height,
+  R2.x #= R1.x,
+
+  R1.x #= Bl.x,
+  R1.width #= Bl.width,
+  R1.y #= Bl.y + 10*Bl.height/20,
+  abs(50*R1.height-3*Bl.height) #=< 50,
+  %65*R1.height #= 4*Bl.height,
+  R2.y #= R1.y + 2*R1.height,
+
+  S0 = new_star(4),
+  S1 = new_star(4),
+  S0.angle0 #= 90,
+  S1.angle0 #= 90,
+  S0.centerX #= S1.centerX,
+  S0.centerY #= S1.centerY,
+  S0.color = white,
+  5*S0.centerX #= Bl.height,
+  S0.centerY #= S0.centerX,
+  %abs(50*S0.diameter- 9*Bl.width) #=< 5,
+  S0.diameter #= 75,
+  3*S0.innerDiameter #= S0.diameter,
+  S1.color = red,
+  25*S1.diameter #= 23*S0.diameter,
+  3*S1.innerDiameter #= S1.diameter,
+  Os = [Bl,R1,R2,S0,S1].
+
