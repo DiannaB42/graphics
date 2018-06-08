@@ -12,7 +12,7 @@
 
 static cdCanvas *cdcanvas = NULL;
 
-typedef enum  {Circle, Line, Rect, Triangle, Polygon}TagType;
+typedef enum  {Circle, Line, Rect, Triangle, Polygon, Text}TagType;
 
 struct Lines{
   int x1;
@@ -58,6 +58,15 @@ struct Vertex{
 struct Polygons{
   int fill;
   struct Vertex* vertices; 
+};
+
+struct Texts{
+  int x1;
+  int x2;
+  int y1;
+  int y2;
+  char* text;
+  int align;
 };
 
 struct Drawing {
@@ -217,6 +226,16 @@ int redraw_cb( Ihandle *self, float x, float y )
         }
         cdCanvasEnd(cdcanvas);
 	break;
+      case 5: ;
+        struct Texts* text = node->value;
+        cdCanvasText(cdcanvas, text->x1, *height - text->y1, text->text);
+        int* w = malloc(sizeof(int));
+        int* h = malloc(sizeof(int));
+        cdCanvasGetTextSize(cdcanvas, text->text, w, h);
+        cdCanvasRect(cdcanvas, text->x1, text->x1 + *w, *height - text->y1 + *h -3,*height - text->y1-3);
+        free(w);
+        free(h);
+        break;
     }
     node = node->next;  
   }
@@ -445,8 +464,39 @@ int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType 
   return -1;
 }
 
-void deletePoly(struct Polygons* poly){
 
+int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText){
+  struct Texts* text;
+  text = (struct Texts*) malloc(sizeof(struct Texts));
+  if(text == NULL){
+    printf("Error: Out of Memory\n");
+    return -1;
+  }
+  text->x1 = cx;
+  text->x2 = cw;
+  text->y1 = cy;
+  text->y2 = ch;
+  text->align = cAlign;
+  text->text = cText;
+  if(insertE(text, Text, 8) ==0){
+    return 0;
+  } else {
+    return -1;
+  }
+}
+
+void deletePoly(struct Polygons* poly){
+  if(poly == NULL){
+    return;
+  }
+  struct Vertex* vertex = poly->vertices;
+  struct Vertex* next;
+  while(vertex != NULL){
+    next = vertex->next;
+    free(vertex);
+    vertex = next;
+  }
+  free(poly);
 }
 
 int assignPoly(int n, TERM x, TERM y, int color, int fill){
@@ -469,6 +519,10 @@ int assignPoly(int n, TERM x, TERM y, int color, int fill){
   curY = y;
   for(int i = 0; i < n; i++){
     vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
+    if(vertex == NULL){
+      deletePoly(poly);
+      return -1;
+    }
     vertex->next = NULL;
     curX = picat_get_car(x);
     curY = picat_get_car(y);
@@ -786,6 +840,33 @@ c_polygon(){
   if(assignPoly(cn, x, y, iColor, cFill) != 0)
     return PICAT_ERROR;
   return PICAT_TRUE;
+}
+
+c_text(){
+  TERM x = 	picat_get_call_arg(1,6);
+  TERM y = 	picat_get_call_arg(2,6);
+  TERM w = 	picat_get_call_arg(3,6);
+  TERM h = 	picat_get_call_arg(4,6);
+  TERM text = 	picat_get_call_arg(5,6);
+  TERM align =	picat_get_call_arg(6,6);
+  if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(align)){
+    return PICAT_ERROR;
+  }
+  if(!picat_is_atom(text)){
+    return PICAT_ERROR;
+  }
+  //need to check what type of value alignment should be
+  int cx = (int) picat_get_integer(x);
+  int cy = (int) picat_get_integer(y);
+  int cw = (int) picat_get_integer(w);
+  int ch = (int) picat_get_integer(h);
+  char* cText = picat_get_atom_name(text);
+  int cAlign = (int) picat_get_integer(align);
+  if(assignText(cx, cy, cw, ch, cAlign, cText) == 0){
+    return PICAT_TRUE;
+  } else {
+    return PICAT_ERROR;
+  }
 }
 
 c_canvas()

@@ -263,6 +263,10 @@ xs('_Polygon'(_Component,_N,Xs,_Ys,_Fill)) = Xs.
 ys('_Polygon'(_Component,_N,_Xs,Ys,_Fill)) = Ys.
 
 
+
+text('_TextBox'(_Component,Text,_Alignment)) = Text.
+align('_TextBox'(_Component,_Text,Alignment)) = Alignment.
+
 diameter('_Circle'(Component,_Fill)) = Diameter =>
     Diameter = Component.width.
 diameter('_Star'(Component,_N,_CenterX,_CenterY,_Angle,_InnerDiameter,_Fill)) = Diameter =>
@@ -865,7 +869,8 @@ c_show('_Image'(Component,_Id,Source)) =>
 c_show('_Label'(Component,Text,Alignment)) =>
     getComponentBound(Component,X,Y,W,H),
     (var(Alignment) -> Alignment = left; true),
-    println($label(X,Y,W,H,Text,Alignment)).
+    println($label(X,Y,W,H,Text,Alignment)),
+    bp.c_text(X,Y,W,H,Text,Alignment).
 c_show('_Line'(Component,X1,Y1,X2,Y2,_Ext)) =>
     println($line(X1,Y1,X2,Y2)),
     bp.c_line(X1,Y1,X2,Y2,Component.color).
@@ -892,7 +897,8 @@ c_show('_Star'(Component,N,CenterX,CenterY,Angle,InnerDiameter,Fill)) =>
     bp.c_star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Component.color,Fill).
 c_show('_TextBox'(Component,Text,Alignment)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($textBox(X,Y,W,H,Text,Alignment)).
+    println($textBox(X,Y,W,H,Text,Alignment)),
+    bp.c_text(X,Y,W,H,Text,Alignment).
 c_show('_Triangle'(Component,X1,Y1,X2,Y2,X3,Y3,Fill)) =>
     println($triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill)),
     bp.c_triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill).    
