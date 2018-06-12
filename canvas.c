@@ -67,6 +67,7 @@ struct Texts{
   int y2;
   char* text;
   int align;
+  int boarder;
 };
 
 struct Drawing {
@@ -229,12 +230,14 @@ int redraw_cb( Ihandle *self, float x, float y )
       case 5: ;
         struct Texts* text = node->value;
         cdCanvasText(cdcanvas, text->x1, *height - text->y1, text->text);
-        int* w = malloc(sizeof(int));
-        int* h = malloc(sizeof(int));
-        cdCanvasGetTextSize(cdcanvas, text->text, w, h);
-        cdCanvasRect(cdcanvas, text->x1, text->x1 + *w, *height - text->y1 + *h -3,*height - text->y1-3);
-        free(w);
-        free(h);
+        if(text->boarder == 1){
+          int* w = malloc(sizeof(int));
+          int* h = malloc(sizeof(int));
+          cdCanvasGetTextSize(cdcanvas, text->text, w, h);
+          cdCanvasRect(cdcanvas, text->x1, text->x1 + *w, *height - text->y1 + *h -3,*height - text->y1-3);
+          free(w);
+          free(h);
+        }
         break;
     }
     node = node->next;  
@@ -465,7 +468,7 @@ int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType 
 }
 
 
-int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText){
+int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText, int color, int boarder){
   struct Texts* text;
   text = (struct Texts*) malloc(sizeof(struct Texts));
   if(text == NULL){
@@ -478,7 +481,17 @@ int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText){
   text->y2 = ch;
   text->align = cAlign;
   text->text = cText;
-  if(insertE(text, Text, 8) ==0){
+  if(boarder == 0){
+    text->boarder = 0;
+  } else {
+    text->boarder = 1;
+  }
+  if( color != curColor && color != -1){
+    curColor = color;
+  } else {
+    color = -1;
+  }
+  if(insertE(text, Text, color) ==0){
     return 0;
   } else {
     return -1;
@@ -843,16 +856,17 @@ c_polygon(){
 }
 
 c_text(){
-  TERM x = 	picat_get_call_arg(1,6);
-  TERM y = 	picat_get_call_arg(2,6);
-  TERM w = 	picat_get_call_arg(3,6);
-  TERM h = 	picat_get_call_arg(4,6);
-  TERM text = 	picat_get_call_arg(5,6);
-  TERM align =	picat_get_call_arg(6,6);
+  TERM x = 	picat_get_call_arg(1,7);
+  TERM y = 	picat_get_call_arg(2,7);
+  TERM w = 	picat_get_call_arg(3,7);
+  TERM h = 	picat_get_call_arg(4,7);
+  TERM text = 	picat_get_call_arg(5,7);
+  TERM align =	picat_get_call_arg(6,7);
+  TERM color = 	picat_get_call_arg(7,7);
   if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(align)){
     return PICAT_ERROR;
   }
-  if(!picat_is_atom(text)){
+  if(!picat_is_atom(text) || !picat_is_atom(color)){
     return PICAT_ERROR;
   }
   //need to check what type of value alignment should be
@@ -861,14 +875,53 @@ c_text(){
   int cw = (int) picat_get_integer(w);
   int ch = (int) picat_get_integer(h);
   char* cText = picat_get_atom_name(text);
+  char* buffer = picat_get_atom_name(color);
+  int iColor = getColorValue(buffer);
   int cAlign = (int) picat_get_integer(align);
-  if(assignText(cx, cy, cw, ch, cAlign, cText) == 0){
+  if(exception == NULL){
+    printf("Error: Exception encountered while converting terms\n");
+    return PICAT_ERROR;
+  }
+  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 1) == 0){
     return PICAT_TRUE;
   } else {
     return PICAT_ERROR;
   }
 }
 
+c_label(){
+  TERM x = 	picat_get_call_arg(1,7);
+  TERM y = 	picat_get_call_arg(2,7);
+  TERM w = 	picat_get_call_arg(3,7);
+  TERM h = 	picat_get_call_arg(4,7);
+  TERM text = 	picat_get_call_arg(5,7);
+  TERM align =	picat_get_call_arg(6,7);
+  TERM color = 	picat_get_call_arg(7,7);
+  if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(align)){
+    return PICAT_ERROR;
+  }
+  if(!picat_is_atom(text) || !picat_is_atom(color)){
+    return PICAT_ERROR;
+  }
+  //need to check what type of value alignment should be
+  int cx = (int) picat_get_integer(x);
+  int cy = (int) picat_get_integer(y);
+  int cw = (int) picat_get_integer(w);
+  int ch = (int) picat_get_integer(h);
+  char* cText = picat_get_atom_name(text);
+  char* buffer = picat_get_atom_name(color);
+  int iColor = getColorValue(buffer);
+  int cAlign = (int) picat_get_integer(align);
+  if(exception == NULL){
+    printf("Error: Exception encountered while converting terms\n");
+    return PICAT_ERROR;
+  }
+  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 0) == 0){
+    return PICAT_TRUE;
+  } else {
+    return PICAT_ERROR;
+  }
+}
 c_canvas()
 {
   TERM x = picat_get_call_arg(1,2);
