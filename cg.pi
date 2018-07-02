@@ -67,7 +67,7 @@ new_image = Image =>
     Component = new_component().
 
 new_label = Label =>
-    Label = $'_Label'(Component,_Text,_Alignment),
+    Label = $'_Label'(Component,_Text,_Alignment,_Font),
     Component = new_component().    
 
 new_line = Line =>
@@ -132,7 +132,7 @@ new_star(N) = _ =>
     handle_exception($positive_int_expected(N),new_star).
     
 new_text_box = TextBox =>
-    TextBox = $'_TextBox'(Component,_Text,_Alignment),
+    TextBox = $'_TextBox'(Component,_Text,_Alignment,_Font),
     Component = new_component().
 
 new_triangle = Triangle =>
@@ -264,11 +264,14 @@ ys('_Polygon'(_Component,_N,_Xs,Ys,_Fill)) = Ys.
 
 
 
-text('_TextBox'(_Component,Text,_Alignment)) = Text.
-text('_Label'(_Component,Text,_Alignment)) = Text.
+text('_TextBox'(_Component,Text,_Alignment,_Font)) = Text.
+text('_Label'(_Component,Text,_Alignment,_Font)) = Text.
 
-align('_TextBox'(_Component,_Text,Alignment)) = Alignment.
-align('_Label'(_Component,_Text,Alignment)) = Alignment.
+align('_TextBox'(_Component,_Text,Alignment,_Font)) = Alignment.
+align('_Label'(_Component,_Text,Alignment,_Font)) = Alignment.
+
+font('_TextBox'(_Component,_Text,_Alignment,Font)) = Font.
+font('_Label'(_Component,_Text,_Alignment,Font)) = Font.
 
 diameter('_Circle'(Component,_Fill)) = Diameter =>
     Diameter = Component.width.
@@ -325,8 +328,8 @@ grid_array(Array,PadX,PadY),
     NoRows = len(Array),
 	NoCols = len(Array[1]),
 	writeln((NoRows,NoCols)),
-    WVector = {GridWidth : _ in 1..NoRows},
-    HVector = {GridHeight : _ in 1..NoCols},
+    WVector = {GridWidth : _ in 1..NoCols},
+    HVector = {GridHeight : _ in 1..NoRows},
     postTableRows(Array,1,NoRows,StartX,PadX,PadY,WVector,HVector),
     postTableColumns(Array,1,NoCols,NoRows,StartY,PadX,PadY,WVector,HVector).
 grid_array(_Grid,PadX,PadY) =>
@@ -365,8 +368,8 @@ tabular_array(Array,PadX,PadY),
     StartY #>= 0,
     NoRows = len(Array),
 	NoCols = len(Array[1]),
-    WVector = {_GridWidth : _ in 1..NoRows},
-    HVector = {_GridHeight : _ in 1..NoCols},
+    WVector = {_GridWidth : _ in 1..NoCols},
+    HVector = {_GridHeight : _ in 1..NoRows},
     postTableRows(Array,1,NoRows,StartX,PadX,PadY,WVector,HVector),
     postTableColumns(Array,1,NoCols,NoRows,StartY,PadX,PadY,WVector,HVector).
 tabular_array(_Grid,PadX,PadY) =>
@@ -786,9 +789,9 @@ cgInstantiateComponent('_Circle'(Component,Fill)) =>
     cgInstantiateBool(Fill).
 cgInstantiateComponent('_Image'(Component,_Id,_Name)) =>     
     cgInstantiateComponent(Component).
-cgInstantiateComponent('_Label'(Component,_Text,_Alignment)) =>
+cgInstantiateComponent('_Label'(Component,_Text,_Alignment,_Font)) =>
     cgInstantiateComponent(Component).
-cgInstantiateComponent('_TextBox'(Component,_Text,_Alignment)) =>
+cgInstantiateComponent('_TextBox'(Component,_Text,_Alignment,_Font)) =>
     cgInstantiateComponent(Component).
 cgInstantiateComponent('_Line'(Component,_X1,_Y1,_X2,_Y2,_Ext)) =>
     cgInstantiateComponent(Component).
@@ -869,11 +872,11 @@ c_show('_Circle'(Component,Fill)) =>
 c_show('_Image'(Component,_Id,Source)) =>
     getComponentBound(Component,X,Y,W,H),
     println($image(X,Y,W,H,Source)).
-c_show('_Label'(Component,Text,Alignment)) =>
+c_show('_Label'(Component,Text,Alignment,Font)) =>
     getComponentBound(Component,X,Y,W,H),
     (var(Alignment) -> Alignment = left; true),
-    println($label(X,Y,W,H,Text,Alignment,Component.color)),
-    bp.c_label(X,Y,W,H,Text,Alignment,Component.color).
+    println($label(X,Y,W,H,Text,Alignment,Component.color,Font)),
+    bp.c_label(X,Y,W,H,Text,Alignment,Component.color,Font).
 c_show('_Line'(Component,X1,Y1,X2,Y2,_Ext)) =>
     println($line(X1,Y1,X2,Y2)),
     bp.c_line(X1,Y1,X2,Y2,Component.color).
@@ -894,15 +897,15 @@ c_show('_RoundRectangle'(Component,ArcWidth,ArcHeight,Fill)) =>
 c_show('_Square'(Component,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
     println($square(X,Y,W,H,Fill)),
-    bp.c_rectangle(X,T,W,H,Component.color,Fill).
+    bp.c_rectangle(X,Y,W,H,Component.color,Fill).
 c_show('_Star'(Component,N,CenterX,CenterY,Angle,InnerDiameter,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
     println($star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Component.color,Fill)),
     bp.c_star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Component.color,Fill).
-c_show('_TextBox'(Component,Text,Alignment)) =>
+c_show('_TextBox'(Component,Text,Alignment,Font)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($textBox(X,Y,W,H,Text,Alignment)),
-    bp.c_text(X,Y,W,H,Text,Alignment,Component.color).
+    println($textBox(X,Y,W,H,Text,Alignment,Font)),
+    bp.c_text(X,Y,W,H,Text,Alignment,Component.color,Font).
 c_show('_Triangle'(Component,X1,Y1,X2,Y2,X3,Y3,Fill)) =>
     println($triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill)),
     bp.c_triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill).    
@@ -956,7 +959,7 @@ cg_component('_Button'(_Component,_Label,_Enabled)) => true.
 cg_component('_Circle'(_Component,_Fill)) => true.
 cg_component('_Component'(_X,_Y,_W,_H,_Window,_Color,_PW,_PH,_No,_Handlers)) => true.
 cg_component('_Image'(_Component,_Id,_Source)) => true.
-cg_component('_Label'(_Component,_Text,_Alignment)) => true.
+cg_component('_Label'(_Component,_Text,_Alignment,_Font)) => true.
 cg_component('_Line'(_Component,_X1,_Y1,_X2,_Y2,_Ext)) => true.
 cg_component('_Oval'(_Component,_Fill)) => true.
 cg_component('_Polygon'(_Component,_N,_Xs,_Ys,_Fill)) => true.
@@ -964,7 +967,7 @@ cg_component('_Rectangle'(_Component,_Fill)) => true.
 cg_component('_RoundRectangle'(_Component,_ArcWidth,_ArcHeight,_Fill)) => true.
 cg_component('_Square'(_Component,_Fill)) => true.
 cg_component('_Star'(_Component,_N,_CenterX,_CenterY,_Angle,_InnerDiameter,_Fill)) => true.
-cg_component('_TextBox'(_Component,_Text,_Alignment)) => true.
+cg_component('_TextBox'(_Component,_Text,_Alignment,_Font)) => true.
 cg_component('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,_X3,_Y3,_Fill)) => true.
 
 var_or_int(Var), var(Var) => true.
