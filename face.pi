@@ -1,0 +1,42 @@
+%by Bobby
+import cg.
+go=>
+    %cgWindow(Win,"MyFace"), Win^width #= 800, Win^height #= 800,
+    %Win^topMargin #= 100, Win^leftMargin #= 100,
+    C = new_circle(),C.width #= 500, C.fill #= 0,
+    %
+    E1 = new_rectangle(),
+    E2 = new_rectangle(),
+    E1.width #= C.width//5,
+    E1.width #= 5*E1.height,
+    E1.width #= E2.width,
+    E1.height #= E2.height,
+    E1.y #= C.y+C.width//3,
+    E2.y #= E1.y,
+    E1.rightX #= C.centerX-C.width//10,
+    C.centerX #= (E1.centerX+E2.centerX)//2,
+    %
+    Nose = new_triangle(),
+    Nose.point1 #= C.centerPoint,
+    Nose.x2 #= C.centerX-C.width//10,
+    Nose.y2 #= C.centerY+C.width//10,
+    Nose.x3 #= C.centerY+C.width//10, 
+    Nose.y3 #= Nose.y2,
+    %
+    Mouth = new_rectangle(),
+    Mouth.width #= 5*Mouth.height,
+    Mouth.width #= E1.width,
+    Mouth.height #= E1.height,
+    Mouth.centerX #= C.centerX,
+    Mouth.y #= C.centerY+3*C.width//10,
+    %
+    Comps = [C,E1,E2,Nose,Mouth],
+    show(Comps).
+
+
+    
+    
+    
+    
+    
+
