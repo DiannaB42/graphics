@@ -1,0 +1,82 @@
+/********************************************************************
+    Constraint-based Graphical Programming in B-Prolog
+    %
+    draw a circle chart based on input data
+*********************************************************************/
+import cg.
+
+go=>
+    circleChart(Os),
+    show(Os).
+
+circleChart(Os)=>
+    Arcs = [A1,A2,A3,A4],
+    foreach (A in Arcs)
+      A = new_arc(),
+      A.width #> 500,
+      A.height #> 500
+    end, 
+    A1.color #= red,
+    Ang1 #= (20*360)//100, 
+    A1.arcAngle #= Ang1,
+
+    A2.color #= blue,
+    Ang2 is (40*360)//100,
+    A2.arcAngle #= Ang2,
+
+    A3.color #= yellow,
+    Ang3 #= (32*360)//100,
+    A3.arcAngle #= Ang3,
+
+    A4.color #= green,
+    Ang4 #= 360-Ang1-Ang2-Ang3,
+    A4.arcAngle #= Ang4,
+    %
+    Labels = [L1,L2,L3,L4],
+    foreach (L in Labels)
+      L = new_label(),
+      L.font = system,
+      L.align = left
+    end,
+    L1.y #> 10,
+    L1.text #= 'Apple',
+    L2.text #= 'Orange',
+    L3.text #= 'Banana',
+    L4.text #= 'Other',
+    %
+    Squares = [S1,S2,S3,S4],
+    foreach (S in Squares)
+      S = new_square(),
+      S.width #= 20	% all squares are 20 pixles wide
+    end,
+    %
+    constrainColor(Squares,Arcs),
+    %cgLeft(Arcs,Squares),
+    %
+    grid([[S1,L1],
+	     [S2,L2],
+	     [S3,L3],
+	     [S4,L4]],2,2),
+
+    arcsNotOverlap(Arcs),
+    %
+    Os=[A1,A2,A3,A4,L1,L2,L3,L4,S1,S2,S3,S4].
+     
+constrainColor([],[])=> true.
+constrainColor([Sq|Sqs],[A|As])=>
+    Sq.color #= A.color,
+    constrainColor(Sqs,As).
+
+arcsNotOverlap([])=> true.
+arcsNotOverlap([_Arc])=> true.
+arcsNotOverlap([Arc|Arcs])=>
+    arcsNotOverlap(Arc,Arcs),
+    arcsNotOverlap(Arcs).
+    
+arcsNotOverlap(_Arc1,[]) => true.
+arcsNotOverlap(Arc1,[Arc|Arcs])=>
+    (Arc1.startAngle #>= Arc.startAngle+Arc.arcAngle) #\/
+     (Arc1.startAngle+Arc1.arcAngle #=< Arc.startAngle),
+     arcsNotOverlap(Arc1,Arcs).
+		
+

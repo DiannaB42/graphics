@@ -252,6 +252,7 @@ fill('_Polygon'(_Component,_N,_Xs,_Ys,Fill)) = Fill.
 fill('_Star'(_Component,_N,_CenterX,_CenterY,_Angle,_InnerDiameter,Fill)) = Fill.
 fill('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,_X3,_Y3,Fill)) = Fill.
 fill('_Rectangle'(_Component,Fill)) = Fill.
+fill('_Square'(_Component,Fill)) = Fill.
 fill('_Circle'(_Componenet,Fill)) = Fill.
 fill('_Oval'(_Componenet,Fill)) = Fill.
 fill('_Arc'(_Component,_StartAngle,_ArcAngle,Fill)) = Fill.
@@ -789,10 +790,14 @@ cgInstantiateComponent('_Circle'(Component,Fill)) =>
     cgInstantiateBool(Fill).
 cgInstantiateComponent('_Image'(Component,_Id,_Name)) =>     
     cgInstantiateComponent(Component).
-cgInstantiateComponent('_Label'(Component,_Text,_Alignment,_Font)) =>
-    cgInstantiateComponent(Component).
-cgInstantiateComponent('_TextBox'(Component,_Text,_Alignment,_Font)) =>
-    cgInstantiateComponent(Component).
+cgInstantiateComponent('_Label'(Component,_Text,Alignment,Font)) =>
+    cgInstantiateComponent(Component),
+    cgInstantiateAlignment(Alignment),
+    cgInstantiateFont(Font).
+cgInstantiateComponent('_TextBox'(Component,_Text,Alignment,Font)) =>
+    cgInstantiateComponent(Component),
+    cgInstantiateAlignment(Alignment),
+    cgInstantiateFont(Font).
 cgInstantiateComponent('_Line'(Component,_X1,_Y1,_X2,_Y2,_Ext)) =>
     cgInstantiateComponent(Component).
 cgInstantiateComponent('_Oval'(Component,Fill)) =>
@@ -827,6 +832,12 @@ cgInstantiateString(T), var(T) => T = "".
 
 cgInstantiateColor(X), nonvar(X) => true.
 cgInstantiateColor(X) => X = black.
+
+cgInstantiateFont(X), nonvar(X) => true.
+cgInstantiateFont(X) => X = system.
+
+cgInstantiateAlignment(X), nonvar(X) => true.
+cgInstantiateAlignment(X) => X = left.
 
 cgPackStar('_Star'(Component,_N,X0,Y0,Angle0,SmallDiameter,_Fill)) =>
     getComponentBound(Component,X,Y,W,H),

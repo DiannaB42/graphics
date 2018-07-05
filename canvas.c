@@ -190,7 +190,6 @@ int redraw_cb( Ihandle *self, float x, float y )
     switch(node->type){
       case 1: ;
         struct Lines *line = node->value;
-        //printf(" line x1 y1 x2 y2 %d %d %d %d %li\n",line->x1,line->y1, line->x2, line->y2, *height); 
         cdCanvasLine(cdcanvas, line->x1, *height - line->y1, line->x2, *height - line->y2);
         break;
       case 0: ;
@@ -251,13 +250,13 @@ int redraw_cb( Ihandle *self, float x, float y )
           cdCanvasGetTextSize(cdcanvas, text->text, w, h);
           switch(text->align){
             case 1:
-	      cdCanvasRect(cdcanvas,text->x1-*w/2,text->x1+*w/2,*height-text->y1+*h-3,*height-text->y1-3);
+	      cdCanvasRect(cdcanvas,text->x1-*w/2,text->x1+*w/2,*height-text->y1,*height-text->y1- *h);
 	      break;
             case 2:
-              cdCanvasRect(cdcanvas,text->x1,text->x1+*w,*height-text->y1+*h-3,*height-text->y1-3);
+              cdCanvasRect(cdcanvas,text->x1,text->x1+*w,*height-text->y1,*height-text->y1- *h);
               break;
             case 3:
-	      cdCanvasRect(cdcanvas,text->x1-*w,text->x1,*height-text->y1+*h-3,*height-text->y1-3);
+	      cdCanvasRect(cdcanvas,text->x1-*w,text->x1,*height-text->y1,*height-text->y1-*h);
 	      break;
           }
           free(w);
@@ -299,9 +298,14 @@ int getFontValue(char* font){
           return 2;
         }
         break;
+      case 's':
+        if(strcmp(font, "system") == 0){
+          return 2;
+        }
+        break;
       case 't':
         if(strcmp(font, "times") == 0){
-          return 3;
+          return 4;
         }
         break;
       default:
@@ -388,13 +392,16 @@ int getAlignValue(char* align){
 void setFont(int font){
   switch(font){
     case 1:
-      cdCanvasFont(cdcanvas,"Courier", CD_PLAIN,12);
+      cdCanvasFont(cdcanvas,"Courier", -1, 0);
       break;
     case 2:
-      cdCanvasFont(cdcanvas,"Helvetica", CD_PLAIN,12);
+      cdCanvasFont(cdcanvas,"Helvetica", -1, 0);
       break;
-    case 3:
-      cdCanvasFont(cdcanvas,"Times", CD_PLAIN,12);
+    case 3: 
+      cdCanvasFont(cdcanvas,"System", -1, 0);
+      break;
+    case 4:
+      cdCanvasFont(cdcanvas,"Times", -1, 0);
       break;
     default:
       return;
@@ -404,20 +411,19 @@ void setFont(int font){
 void setAlign(int align){
   switch(align){
     case 1:
-      cdCanvasTextAlignment(cdcanvas, CD_BASE_CENTER);
+      cdCanvasTextAlignment(cdcanvas, CD_NORTH);
       break;
     case 2:
-      cdCanvasTextAlignment(cdcanvas, CD_BASE_LEFT);
+      cdCanvasTextAlignment(cdcanvas, CD_NORTH_WEST);
       break;
     case 3:
-      cdCanvasTextAlignment(cdcanvas, CD_BASE_RIGHT);
+      cdCanvasTextAlignment(cdcanvas, CD_NORTH_EAST);
       break;
     default:
       break;
   }
 }
 int assignRect(int x1, int x2, int y1, int y2, int color, int fill, TagType type){
-  //Puts the variables into array holding shapes we want to draw
   if(type == 2){
     //Rectangle
     struct Rects *rect;
@@ -505,7 +511,6 @@ int assignStar(int x, int y,int w,int h,int n, int centerX,int centerY, int angl
     int sy = (int)(centerY-(diameter/2)*sin(rad1));
     int lx = (int)(centerX-(h/2)*cos(rad2));
     int ly = (int)(centerY-(h/2)*sin(rad2));
-    //printf("Small vertex %d %d\nLarge %d %d", sx, sy, lx, ly);
     vertex = (struct Vertex*) malloc(sizeof(struct Vertex));
     if( i == 0){
       polygon->vertices = vertex;
@@ -634,7 +639,6 @@ int assignPoly(int n, TERM x, TERM y, int color, int fill){
     } 
     valX = (int) picat_get_integer(curX);
     valY = (int) picat_get_integer(curY);
-    //printf("Assigning vertex x %d y %d\n", valX, valY);
     vertex->x = valX;
     vertex->y = valY;
     if( i == 0){
@@ -993,7 +997,6 @@ c_label(){
   if(!picat_is_atom(text) || !picat_is_atom(color) || !picat_is_atom(align)|| !picat_is_atom(font)){
     return PICAT_ERROR;
   }
-  //need to check what type of value alignment should be
   int cx = (int) picat_get_integer(x);
   int cy = (int) picat_get_integer(y);
   int cw = (int) picat_get_integer(w);
