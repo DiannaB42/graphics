@@ -69,6 +69,7 @@ struct Texts{
   int align;
   int boarder;
   int font;
+  int padding;
 };
 
 struct Drawing {
@@ -247,16 +248,18 @@ int redraw_cb( Ihandle *self, float x, float y )
         if(text->boarder == 1){
           int* w = malloc(sizeof(int));
           int* h = malloc(sizeof(int));
+          int pad = text->padding;
+          printf("%d", pad);
           cdCanvasGetTextSize(cdcanvas, text->text, w, h);
           switch(text->align){
             case 1:
-	      cdCanvasRect(cdcanvas,text->x1-*w/2,text->x1+*w/2,*height-text->y1,*height-text->y1- *h);
+	      cdCanvasRect(cdcanvas,text->x1-*w/2-pad,text->x1+*w/2+ pad,*height-text->y1+pad,*height-text->y1-*h-pad);
 	      break;
             case 2:
-              cdCanvasRect(cdcanvas,text->x1,text->x1+*w,*height-text->y1,*height-text->y1- *h);
+              cdCanvasRect(cdcanvas,text->x1-pad,text->x1+*w+pad,*height-text->y1+pad,*height-text->y1-*h-pad);
               break;
             case 3:
-	      cdCanvasRect(cdcanvas,text->x1-*w,text->x1,*height-text->y1,*height-text->y1-*h);
+	      cdCanvasRect(cdcanvas,text->x1-*w-pad,text->x1+pad,*height-text->y1+pad,*height-text->y1-*h-pad);
 	      break;
           }
           free(w);
@@ -563,7 +566,7 @@ int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType 
 }
 
 
-int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText, int color, int boarder, int font){
+int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText, int color, int boarder, int font, int padding){
   struct Texts* text;
   text = (struct Texts*) malloc(sizeof(struct Texts));
   if(text == NULL){
@@ -577,6 +580,11 @@ int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText, int colo
   text->align = cAlign;
   text->text = cText;
   text->font = font;
+  if(padding < 0){
+    text->padding = 0;
+  } else {
+    text->padding = padding;
+  }
   if(boarder == 0){
     text->boarder = 0;
   } else {
@@ -946,15 +954,16 @@ c_polygon(){
 }
 
 c_text(){
-  TERM x = 	picat_get_call_arg(1,8);
-  TERM y = 	picat_get_call_arg(2,8);
-  TERM w = 	picat_get_call_arg(3,8);
-  TERM h = 	picat_get_call_arg(4,8);
-  TERM text = 	picat_get_call_arg(5,8);
-  TERM align =	picat_get_call_arg(6,8);
-  TERM color = 	picat_get_call_arg(7,8);
-  TERM font =	picat_get_call_arg(8,8);
-  if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h)){
+  TERM x = 	picat_get_call_arg(1,9);
+  TERM y = 	picat_get_call_arg(2,9);
+  TERM w = 	picat_get_call_arg(3,9);
+  TERM h = 	picat_get_call_arg(4,9);
+  TERM text = 	picat_get_call_arg(5,9);
+  TERM align =	picat_get_call_arg(6,9);
+  TERM color = 	picat_get_call_arg(7,9);
+  TERM font =	picat_get_call_arg(8,9);
+  TERM padding =picat_get_call_arg(9,9);
+  if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(padding)){
     return PICAT_ERROR;
   }
   if(!picat_is_atom(text) || !picat_is_atom(color) || !picat_is_atom(align) || !picat_is_atom(font)){
@@ -964,6 +973,7 @@ c_text(){
   int cy = (int) picat_get_integer(y);
   int cw = (int) picat_get_integer(w);
   int ch = (int) picat_get_integer(h);
+  int cPadding = (int) picat_get_integer(padding);
   char* cText = picat_get_atom_name(text);
   char* buffer = picat_get_atom_name(color);
   int iColor = getColorValue(buffer);
@@ -975,7 +985,7 @@ c_text(){
     printf("Error: Exception encountered while converting terms\n");
     return PICAT_ERROR;
   }
-  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 1, cFont) == 0){
+  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 1, cFont, cPadding) == 0){
     return PICAT_TRUE;
   } else {
     return PICAT_ERROR;
@@ -1012,7 +1022,7 @@ c_label(){
     printf("Error: Exception encountered while converting terms\n");
     return PICAT_ERROR;
   }
-  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 0, cFont) == 0){
+  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 0, cFont, 0) == 0){
     return PICAT_TRUE;
   } else {
     return PICAT_ERROR;

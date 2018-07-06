@@ -1100,7 +1100,7 @@ void Cboot() {
     extern int c_polygon();
     insert_cpred("c_polygon", 5, c_polygon);
     extern int c_text();
-    insert_cpred("c_text", 8, c_text);
+    insert_cpred("c_text", 9, c_text);
     extern int c_label();
     insert_cpred("c_label", 8, c_label);
 
