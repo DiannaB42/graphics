@@ -132,9 +132,8 @@ new_star(N) = _ =>
     handle_exception($positive_int_expected(N),new_star).
     
 new_text_box = TextBox =>
-    TextBox = $'_TextBox'(Component,_Text,_Alignment,_Font,Padding,FontSize),
+    TextBox = $'_TextBox'(Component,_Text,_Alignment,_Font,_Padding,FontSize),
     Component = new_component(),
-    Padding :: 0..100,
     FontSize :: 1..100.
 
 new_triangle = Triangle =>
@@ -841,21 +840,19 @@ cgInstantiateBool(X) => (X=1; X=0).
 
 cgInstantiateString(T), var(T) => T = "".
 
-cgInstantiateColor(X), nonvar(X) => true.
+cgInstantiateColor(X), nonvar(X) => (X=black;X=blue;X=dark_red;X=green;X=grey;X=gray;X=pink;X=red;X=yellow;X=white;X='dark red').
 cgInstantiateColor(X) => X = black.
 
-cgInstantiateFont(X), nonvar(X) => true.
-/*    (X == 'system' -> 
-	true;
-	false).*/
+cgInstantiateFont(X), nonvar(X) => (X=system;X=courier;X=times;X=helvetica).
 cgInstantiateFont(X) => X = system.
 
 cgInstantiateFontSize(X), nonvar(X) => true.
 cgInstantiateFontSize(X) => X = 12.
 
-cgInstantiateAlignment(X), nonvar(X) => true.
+cgInstantiateAlignment(X), nonvar(X) => (X=left;X=center;X=right).
 cgInstantiateAlignment(X) => X = left.
 
+cgInstantiatePadding(X),X < 0 => false.
 cgInstantiatePadding(X),nonvar(X) => true.
 cgInstantiatePadding(X) => X = 0.
 

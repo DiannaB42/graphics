@@ -336,7 +336,7 @@ int getColorValue(char* color){
         }
         break;
       case 'd':
-        if(strcmp(color, "dark red") == 0){
+        if(strcmp(color, "dark_red") == 0 || strcmp(color,"dark red") == 0){
           return 2;
         }
         break;
