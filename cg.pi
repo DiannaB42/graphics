@@ -67,7 +67,7 @@ new_image = Image =>
     Component = new_component().
 
 new_label = Label =>
-    Label = $'_Label'(Component,_Text,_Alignment,_Font),
+    Label = $'_Label'(Component,_Text,_Alignment,_Font,_FontSize),
     Component = new_component().    
 
 new_line = Line =>
@@ -132,9 +132,10 @@ new_star(N) = _ =>
     handle_exception($positive_int_expected(N),new_star).
     
 new_text_box = TextBox =>
-    TextBox = $'_TextBox'(Component,_Text,_Alignment,_Font,Padding),
+    TextBox = $'_TextBox'(Component,_Text,_Alignment,_Font,Padding,FontSize),
     Component = new_component(),
-    Padding ::0..100.
+    Padding :: 0..100,
+    FontSize :: 1..100.
 
 new_triangle = Triangle =>
     Triangle = $'_Triangle'(Component,X1,Y1,X2,Y2,X3,Y3,Fill),
@@ -266,16 +267,20 @@ ys('_Polygon'(_Component,_N,_Xs,Ys,_Fill)) = Ys.
 
 
 
-text('_TextBox'(_Component,Text,_Alignment,_Font,_Padding)) = Text.
-text('_Label'(_Component,Text,_Alignment,_Font)) = Text.
+text('_TextBox'(_Component,Text,_Alignment,_Font,_Padding,_FontSize)) = Text.
+text('_Label'(_Component,Text,_Alignment,_Font,_FontSize)) = Text.
 
-align('_TextBox'(_Component,_Text,Alignment,_Font,_Padding)) = Alignment.
-align('_Label'(_Component,_Text,Alignment,_Font)) = Alignment.
+align('_TextBox'(_Component,_Text,Alignment,_Font,_Padding,_FontSize)) = Alignment.
+align('_Label'(_Component,_Text,Alignment,_Font,_FontSize)) = Alignment.
 
-font('_TextBox'(_Component,_Text,_Alignment,Font,_Padding)) = Font.
-font('_Label'(_Component,_Text,_Alignment,Font)) = Font.
+font('_TextBox'(_Component,_Text,_Alignment,Font,_Padding,_FontSize)) = Font.
+font('_Label'(_Component,_Text,_Alignment,Font,_FontSize)) = Font.
 
-padding('_TextBox'(_Component,_Text,_Alignment,_Font,Padding)) = Padding.
+font_size('_TextBox'(_Component,_Text,_Alignment,_Font,_Padding,FontSize)) = FontSize.
+font_size('_Label'(_Component,_Text,_Alignment,_Font,FontSize)) = FontSize.
+
+
+padding('_TextBox'(_Component,_Text,_Alignment,_Font,Padding,_FontSize)) = Padding.
 
 diameter('_Circle'(Component,_Fill)) = Diameter =>
     Diameter = Component.width.
@@ -793,15 +798,17 @@ cgInstantiateComponent('_Circle'(Component,Fill)) =>
     cgInstantiateBool(Fill).
 cgInstantiateComponent('_Image'(Component,_Id,_Name)) =>     
     cgInstantiateComponent(Component).
-cgInstantiateComponent('_Label'(Component,_Text,Alignment,Font)) =>
-    cgInstantiateComponent(Component),
-    cgInstantiateAlignment(Alignment),
-    cgInstantiateFont(Font).
-cgInstantiateComponent('_TextBox'(Component,_Text,Alignment,Font,Padding)) =>
+cgInstantiateComponent('_Label'(Component,_Text,Alignment,Font,FontSize)) =>
     cgInstantiateComponent(Component),
     cgInstantiateAlignment(Alignment),
     cgInstantiateFont(Font),
-    cgInstantiatePadding(Padding).
+    cgInstantiateFontSize(FontSize).
+cgInstantiateComponent('_TextBox'(Component,_Text,Alignment,Font,Padding,FontSize)) =>
+    cgInstantiateComponent(Component),
+    cgInstantiateAlignment(Alignment),
+    cgInstantiateFont(Font),
+    cgInstantiatePadding(Padding),
+    cgInstantiateFontSize(FontSize).
 cgInstantiateComponent('_Line'(Component,_X1,_Y1,_X2,_Y2,_Ext)) =>
     cgInstantiateComponent(Component).
 cgInstantiateComponent('_Oval'(Component,Fill)) =>
@@ -838,7 +845,13 @@ cgInstantiateColor(X), nonvar(X) => true.
 cgInstantiateColor(X) => X = black.
 
 cgInstantiateFont(X), nonvar(X) => true.
+/*    (X == 'system' -> 
+	true;
+	false).*/
 cgInstantiateFont(X) => X = system.
+
+cgInstantiateFontSize(X), nonvar(X) => true.
+cgInstantiateFontSize(X) => X = 12.
 
 cgInstantiateAlignment(X), nonvar(X) => true.
 cgInstantiateAlignment(X) => X = left.
@@ -890,11 +903,11 @@ c_show('_Circle'(Component,Fill)) =>
 c_show('_Image'(Component,_Id,Source)) =>
     getComponentBound(Component,X,Y,W,H),
     println($image(X,Y,W,H,Source)).
-c_show('_Label'(Component,Text,Alignment,Font)) =>
+c_show('_Label'(Component,Text,Alignment,Font,FontSize)) =>
     getComponentBound(Component,X,Y,W,H),
     (var(Alignment) -> Alignment = left; true),
-    println($label(X,Y,W,H,Text,Alignment,Component.color,Font)),
-    bp.c_label(X,Y,W,H,Text,Alignment,Component.color,Font).
+    println($label(X,Y,W,H,Text,Alignment,Component.color,Font,FontSize)),
+    bp.c_label(X,Y,W,H,Text,Alignment,Component.color,Font,FontSize).
 c_show('_Line'(Component,X1,Y1,X2,Y2,_Ext)) =>
     println($line(X1,Y1,X2,Y2)),
     bp.c_line(X1,Y1,X2,Y2,Component.color).
@@ -920,10 +933,10 @@ c_show('_Star'(Component,N,CenterX,CenterY,Angle,InnerDiameter,Fill)) =>
     getComponentBound(Component,X,Y,W,H),
     println($star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Component.color,Fill)),
     bp.c_star(X,Y,W,H,N,CenterX,CenterY,Angle,InnerDiameter,Component.color,Fill).
-c_show('_TextBox'(Component,Text,Alignment,Font,Padding)) =>
+c_show('_TextBox'(Component,Text,Alignment,Font,Padding,FontSize)) =>
     getComponentBound(Component,X,Y,W,H),
-    println($textBox(X,Y,W,H,Text,Alignment,Font,Padding)),
-    bp.c_text(X,Y,W,H,Text,Alignment,Component.color,Font,Padding).
+    println($textBox(X,Y,W,H,Text,Alignment,Component.color,Font,FontSize,Padding)),
+    bp.c_text(X,Y,W,H,Text,Alignment,Component.color,Font,FontSize,Padding).
 c_show('_Triangle'(Component,X1,Y1,X2,Y2,X3,Y3,Fill)) =>
     println($triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill)),
     bp.c_triangle(X1,Y1,X2,Y2,X3,Y3,Component.color,Fill).    
@@ -977,7 +990,7 @@ cg_component('_Button'(_Component,_Label,_Enabled)) => true.
 cg_component('_Circle'(_Component,_Fill)) => true.
 cg_component('_Component'(_X,_Y,_W,_H,_Window,_Color,_PW,_PH,_No,_Handlers)) => true.
 cg_component('_Image'(_Component,_Id,_Source)) => true.
-cg_component('_Label'(_Component,_Text,_Alignment,_Font)) => true.
+cg_component('_Label'(_Component,_Text,_Alignment,_Font,_FontSize)) => true.
 cg_component('_Line'(_Component,_X1,_Y1,_X2,_Y2,_Ext)) => true.
 cg_component('_Oval'(_Component,_Fill)) => true.
 cg_component('_Polygon'(_Component,_N,_Xs,_Ys,_Fill)) => true.
@@ -985,7 +998,7 @@ cg_component('_Rectangle'(_Component,_Fill)) => true.
 cg_component('_RoundRectangle'(_Component,_ArcWidth,_ArcHeight,_Fill)) => true.
 cg_component('_Square'(_Component,_Fill)) => true.
 cg_component('_Star'(_Component,_N,_CenterX,_CenterY,_Angle,_InnerDiameter,_Fill)) => true.
-cg_component('_TextBox'(_Component,_Text,_Alignment,_Font,_Padding)) => true.
+cg_component('_TextBox'(_Component,_Text,_Alignment,_Font,_Padding,_FontSize)) => true.
 cg_component('_Triangle'(_Component,_X1,_Y1,_X2,_Y2,_X3,_Y3,_Fill)) => true.
 
 var_or_int(Var), var(Var) => true.

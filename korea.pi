@@ -1,0 +1,124 @@
+import cg.
+
+go =>
+    korea(Os),
+    show(Os).
+
+korea(Os) =>
+  Ss=[S0,S1,S2,S3], % positions for the diagonal rectangles
+  foreach (I in Ss)
+    I = new_rectangle()
+  end,
+  S0.width #=100,
+  S0.height #=100,
+  Extra = [E0,E1,E2,E3,E4],
+  foreach (J in Extra)
+    J = new_rectangle()
+  end,
+  grid([[S0,E0,S1],[E1,E2,E3],[S2,E4,S3]]),
+
+  Frame = new_rectangle(),
+  Frame.fill#=0,
+  Frame.width #= S0.width*3, 
+  Frame.width #= Frame.height,
+  Frame.x #= S0.x,
+  Frame.y #= S0.y,
+
+  Polys = [B0,B1,B2,B3],
+  createBigPoly([S0,S1,S2,S3],Polys),
+  Ps0 = [Pa,Pa1,Pa2],
+  Ps1 = [Pb,Pb1,Pb2],
+  Ps2 = [Pc,Pc1,Pc2],
+  Ps3 = [Pd,Pd1,Pd2],
+  createMulPs(Ps0,B0,2,3,1,4),
+  createMulPs(Ps1,B1,1,2,4,3),
+  createMulPs(Ps2,B2,2,1,3,4),
+  createMulPs(Ps3,B3,3,2,4,1),
+  
+  getPbyP0(SP2,Pc1,9,11,20,2,1,3,4,white),
+  getPbyP0(SP1a,Pb,9,11,20,1,2,4,3,white),
+  getPbyP0(SP1b,Pb2,9,11,20,1,2,4,3,white),
+  getPbyP0(SP3a,Pd,9,11,20,2,1,3,4,white),
+  getPbyP0(SP3b,Pd1,9,11,20,2,1,3,4,white),
+  getPbyP0(SP3c,Pd2,9,11,20,2,1,3,4,white),
+
+  Red = new_arc(),
+  Red.color #= red,
+  2*Red.width #= 3*S0.width,
+  Red.height #= Red.width,
+  Red.startAngle #= 0,
+  Red.arcAngle #= 180,
+  Red.x #= S0.rightX - S0.width/4,
+  Red.y #= Red.x,
+
+  Blue = new_arc(),
+  Blue.color #= blue,
+  Blue.x #= Red.x,
+  Blue.y #= Red.y,
+  Blue.height #= Red.height,
+  Blue.width #= Red.width,
+  Blue.startAngle #= 180,
+  Blue.arcAngle #= 180,
+
+  AR = new_arc(),
+  AR.color #= red,
+  AR.width #= Red.width/2,
+  AR.height #= Red.height/3,
+  AR.startAngle #= 180,
+  AR.arcAngle #= 200,
+  AR.rightX #= Red.centerX,
+  AR.centerY #= Red.centerY,
+
+  BR = new_arc(),
+  BR.color #= blue,
+  AR.width #= BR.width,
+  AR.height #= BR.height,
+  BR.startAngle #= 0,
+  BR.arcAngle #= 200,
+  BR.x #= Red.centerX,
+  BR.y #= AR.y + AR.width/20,  
+
+  append(Ps0,Ps1,Psa),
+  append(Ps2,Ps3,Psb),
+  append(Psa,Psb,Ps), 
+
+  append([SP2],[SP1a,SP1b],Sp12),
+  append(Sp12,[SP3a,SP3b,SP3c],Sps),
+  append(Ps,Sps,PM),
+    
+  Os=[Frame,Red,Blue,AR,BR|PM].
+
+createBigPoly([],[]) => true.
+createBigPoly([R0|Res],[B0|Bes])=>
+      B0 = new_polygon(4),
+      B0.color #= black,
+      X = [R0.centerX,R0.x,R0.centerX,R0.rightX],
+      Y = [R0.y,R0.centerY,R0.bottomY,R0.centerY],
+      B0.xs #= X,
+      B0.ys #= Y,  
+      createBigPoly(Res,Bes).
+
+createMulPs([Pa,Pb,Pc],P,A,B,C,D)=>
+    getPbyP0(Pa,P,0,4,20,A,B,C,D,red),
+    getPbyP0(Pb,P,6,10,20,A,B,C,D,black),
+    getPbyP0(Pc,P,12,16,20,A,B,C,D,black).
+    
+
+ getPbyP0(P,P0,I1,I2,T,A,B,C,D,Color)=>  
+    P = new_polygon(4),
+    P.color #= Color,
+    Pxs #= P0.xs,
+    Pys #= P0.ys,
+    print(P0),
+    Px1 #= (T-I1)*Pxs[C]//T + I1*Pxs[D]//T,
+    Px2 #= (T-I1)*Pxs[A]//T + I1*Pxs[B]//T,
+    Px3 #= (T-I2)*Pxs[A]//T + I2*Pxs[B]//T,
+    Px4 #= (T-I2)*Pxs[C]//T + I2*Pxs[D]//T,
+    Py1 #= (T-I1)*Pys[C]//T + I1*Pys[D]//T, 
+    Py2 #= (T-I1)*Pys[A]//T + I1*Pys[B]//T,
+    Py3 #= (T-I2)*Pys[A]//T + I2*Pys[B]//T,
+    Py4 #= (T-I2)*Pys[C]//T + I2*Pys[D]//T,
+    X1 #= [Px1,Px2,Px3,Px4],
+    Y1 #= [Py1,Py2,Py3,Py4],
+    P.xs #= X1,
+    P.ys #= Y1.

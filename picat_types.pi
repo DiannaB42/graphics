@@ -1,0 +1,87 @@
+import cg.
+
+/********************************************************************
+    Constraint-based Graphical Programming in B-Prolog
+    %
+    draw a diagram that shows the hierarchy of Java AWT's classes
+*********************************************************************/
+go=>
+    %cgWindow(Win,"Picat Types"),Win^topMargin #= 50, Win^leftMargin#=30, 
+    %handleWindowClosing(Win),
+    generateNodes(Tree,Os),
+    connectTree(Tree,Ls,[]),
+    tree(Tree,left_right,20,10,centered),
+    %cgSame(Os,fontName,"DialogInput"),
+    %cgSame(Os,fontSize,16),
+    %cgSame(Os,fontStyle,bold),
+    %cgSame(Os,window,Win), 
+    %cgSame(Ls,window,Win), 
+    %cgStartRecord(javaclasses1),
+    append(Os,Ls,L),
+    show(L).
+
+generateNodes(Tree,Os)=>
+    Os=[Term,Var,Attr_var,Dvar,Atomic,Atom,Char,Number,Integer,Real,
+        Compound,List,String,Struct,Array,Map,Set],
+    Labs=['term','var','attr_var','dvar','atomic','atom','char','number','integer','real',
+	'compound','list','string','struct','array','map','set'],
+    foreach (I in 1..17)
+	Os[I]  = new_text_box(),
+	Os[I].text = Labs[I]
+    end,
+    Tree=$node(Term,
+	      [node(Var,
+	            [node(Attr_var,
+		           [node(Dvar,[])])]),
+              node(Atomic,
+                   [node(Atom,
+                         [node(Char,[])]),
+                    node(Number,
+                         [node(Integer,[]),
+                          node(Real,[])])]),
+              node(Compound,
+                   [node(List,
+                         [node(String,[])]),
+                    node(Struct,
+                         [node(Array,[]),
+                          node(Map,[node(Set,[])])])])]).
+
+
+connectTrees([],Ls,LsR)=>Ls=LsR.
+connectTrees([C|Cs],Ls,LsR)=>
+    connectTree(C,Ls,Ls1),
+    connectTrees(Cs,Ls1,LsR).
+
+connectTree(node(_,[]),Ls,LsR)=>Ls=LsR.
+connectTree(node(Box,Children),Os,LsR)=>
+    Os = [Vl,Hl|Ls],
+    getFirst(Children,$node(FirstC,_)),
+    getLast(Children,$node(LastC,_)),
+    Vl = new_line(),
+    Vl.y1 #= FirstC.centerY, Vl.y2 #= LastC.centerY,
+    Vl.x1 #= Vl.x2, Vl.x1 #= Box.rightX+4,
+    %
+    Hl = new_line(),
+    Hl.x1 #= Box.rightX, Hl.x2 #= Vl.x1,
+    Hl.y1 #= Box.centerY, Hl.y2 #= Hl.y1,
+    %
+    connectChildren(Vl,Children,Ls,Ls1),
+    connectTrees(Children,Ls1,LsR).
+
+getFirst([X|_],Y) => Y= X.
+
+getLast(L,X)=>
+    RL = reverse(L),
+    getFirst(RL,X).
+
+
+connectChildren(_,[],Ls,LsR)=> Ls = LsR.
+connectChildren(Line,[node(C,_)|Cs],Ls,LsR)=>
+    L = new_line(),
+    Ls=[L|Ls1],
+    L.x1 #= Line.x1, L.x2 #= C.x-2,
+    L.y1 #= C.centerY, L.y2 #= L.y1,
+    connectChildren(Line,Cs,Ls1,LsR).
+    
+
+
