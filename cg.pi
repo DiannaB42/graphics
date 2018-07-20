@@ -132,9 +132,8 @@ new_star(N) = _ =>
     handle_exception($positive_int_expected(N),new_star).
     
 new_text_box = TextBox =>
-    TextBox = $'_TextBox'(Component,_Text,_Alignment,_Font,_Padding,FontSize),
-    Component = new_component(),
-    FontSize :: 1..100.
+    TextBox = $'_TextBox'(Component,_Text,_Alignment,_Font,_Padding,_FontSize),
+    Component = new_component().
 
 new_triangle = Triangle =>
     Triangle = $'_Triangle'(Component,X1,Y1,X2,Y2,X3,Y3,Fill),
@@ -306,6 +305,7 @@ rightBottomPoint(Component) = $point(RightX,BottomY) =>
 centerPoint(Component) = $point(X,Y) =>
     X = Component.centerX,
     Y = Component.centerY.
+
 
 %%% constraints
 grid(Rows) =>

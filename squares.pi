@@ -1,0 +1,85 @@
+/********************************************************************
+  draw a chessboard of squares
+*********************************************************************/
+
+import cg.
+
+go=>
+    squares(Os),
+    show(Os).
+
+squares(Spirals)=>
+    Squares = [S0,S1,S2,S3],
+    N = 5,
+    createSquares(N,Squares),
+    grid(Squares),
+    listlist2list(Squares,SquaresList),
+    %Spirals = SquaresList.
+    spirals(Squares,2,8,Spirals).
+
+listlist2list([],List)=>List=[].
+listlist2list([X|Xs],List)=>
+    listlist2list(Xs,List1),
+    append(X,List1,List).
+    
+createSquares(_,[])=> true.
+createSquares(N,[X|Xs])=>
+    X = new_list(N),
+    foreach (S in X)
+      S = new_square(),
+      S.width #= 50,
+      S.fill #= 0
+    end,
+    createSquares(N,Xs).
+
+spirals([],_,_,Spirals)=>Spirals=[].
+spirals([List|Lists],I,J,Spirals)=>
+    spirals1(List,I,J,Spirals,SpiralsR),
+    spirals(Lists,J,I,SpiralsR).
+    
+spirals1([],_,_,Spirals,SpiralsR)=>Spirals=SpiralsR.
+spirals1([S|List],I,J,Spirals,SpiralsR)=>
+    spiral(10,I,J,S,Spirals,Spirals1),
+    spirals1(List,J,I,Spirals1,SpiralsR).
+
+spiral(N,I,J,R,Spirals,SpiralsR)=>
+    Spirals=[P|Spirals1],
+    rectToPoly(R,P),
+    spiral1(N,I,J,P,Spirals1,SpiralsR).
+
+spiral1(0,_,_,_,Spirals,SpiralsR)=>Spirals=SpiralsR.
+spiral1(N,I,J,P,Spirals,SpiralsR)=>
+    Spirals=[NewP|Spirals1],
+    rotatePoly(P,I,J,NewP),
+    N1 = N-1,
+    spiral1(N1,I,J,NewP,Spirals1,SpiralsR).
+    
+rectToPoly(S,P)=>
+    P = new_polygon(4),
+    P.fill #= 0,
+    Sx #= S.x + S.width,
+    Sy #= S.y + S.height,
+    X #= [ S.x, S.x,  Sx,  Sx],
+    Y #= [ S.y,  Sy,  Sy, S.y],
+    P.xs #= X,
+    P.ys #= Y.
+
+rotatePoly(P,I,J,NewP)=>
+    NewP = new_polygon(4),
+    NewP.fill #=0,
+    Px = P.xs,
+    Py = P.ys,
+    Px1 #= I*Px[1]//10 + J*Px[2]//10,
+    Px2 #= I*Px[2]//10 + J*Px[3]//10,
+    Px3 #= I*Px[3]//10 + J*Px[4]//10,
+    Px4 #= I*Px[4]//10 + J*Px[1]//10,
+    Py1 #= I*Py[1]//10 + J*Py[2]//10,
+    Py2 #= I*Py[2]//10 + J*Py[3]//10,
+    Py3 #= I*Py[3]//10 + J*Py[4]//10,
+    Py4 #= I*Py[4]//10 + J*Py[1]//10,
+    NewP.xs = [Px1,Px2,Px3,Px4],
+    NewP.ys = [Py1,Py2,Py3,Py4].
+    
+
+
+

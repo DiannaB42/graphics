@@ -1,0 +1,96 @@
+import cg.
+go=>
+    domino(1,S1,Cs1),
+    domino(2,S2,Cs2),
+    domino(3,S3,Cs3),
+    domino(4,S4,Cs4),
+    domino(5,S5,Cs5),
+    S1.width #= 60,
+    Bs = [B1,B2,B3,B4],
+    foreach (B in Bs)
+	B = new_rectangle()
+    end,
+    grid([[B1,S1,B2],
+    	  [S2,S3,S4],
+    	  [B3,S5,B4]]),
+    Css =[Cs1|Cs2],
+    appendLists([Css,Cs3,Cs4,Cs5],[],Cs),
+    foreach (C in Cs)
+      C.width #= Cs1.width
+    end,
+    Comps=[S1,S2,S3,S4,S5|Cs],
+    %Comps = [S1,S2,S3,S4,S5],
+    show(Comps).
+
+
+domino(1,S,Cs)=>
+    S = new_square(),
+    S.fill #= 0,
+    Cs = new_circle(),
+    S.centerX #= Cs.centerX,
+    S.centerY #= Cs.centerY.
+    %constraint(S,Cs).
+
+domino(N,S,Cs)=>
+    S = new_square(),S.fill#=0,
+    Cs= new_list(N),
+    foreach (I in Cs)
+	I = new_circle()
+%        I.x #> S.x,
+%	I.x + I.width #< S.x + S.width,
+%	I.y #> S.y,
+%	I.y + S.height #< S.y + S.height
+    end,
+    %cgInside(Cs,S),
+    constraint(S,Cs).
+
+constraint(S,[C1,C2])=>
+    Es = [E1,E2,E3,E4,E5,E6],
+    Dum = new_rectangle(),
+    foreach(E in Es)
+	E = new_rectangle()
+    end,
+    grid([[C1,E1,E2],
+	  [E3,Dum,E4],
+	  [E5,E6,C2]]),
+    S.centerX #= Dum.centerX,
+    S.centerY #= Dum.centerY.
+
+constraint(S,[C1,C2,C3])=> 
+    Es = [E1,E2,E3,E4,E5,E6],
+    foreach(E in Es)
+	E = new_rectangle()
+    end,
+    grid([[C1,E1,E2],
+	  [E3,C2,E4],
+	  [E5,E6,C3]]),
+    S.centerX #= C2.centerX,
+    S.centerY #= C2.centerY.
+constraint(S,[C1,C2,C3,C4])=> 
+    Es = [E1,E2,E3,E4],
+    Dum = new_circle(),
+    foreach(E in Es)
+	E = new_rectangle()
+    end,
+    grid([[C1,E1,C2],
+	  [E2,Dum,E3],
+	  [C3,E4,C4]]),
+    S.centerX #= Dum.centerX,
+    S.centerY #= Dum.centerY.
+constraint(S,[C1,C2,C3,C4,C5])=>    
+    Es = [E1,E2,E3,E4],
+    foreach(E in Es)
+	E = new_rectangle()
+    end,
+    grid([[C1,E1,C2],
+	  [E2,C3,E3],
+	  [C4,E4,C5]]),
+    S.centerX #= C3.centerX,
+    S.centerY #= C3.centerY.
+
+appendLists([],All,Ans) => All = Ans.
+appendLists([L1|Ls],All0,All) =>
+    append(L1,All0,All1),
+    appendLists(Ls,All1,All).
+
+    

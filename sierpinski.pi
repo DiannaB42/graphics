@@ -1,0 +1,46 @@
+/********************************************************************
+    Constraint-based Graphical Programming in B-Prolog
+    %
+    draw Sierpinski's triangles
+*********************************************************************/
+import cg.
+
+go=>
+   sierpinski(Os),
+   show(Os).
+
+sierpinski(Os)=>
+   S = new_square(), S.fill #= 0, S.width #>= 600,
+   T = new_triangle(), T.fill #= 0,
+   cutSquare(S,T),
+   divideTriangle(T,5,Ts,[]),
+   Os = Ts.
+
+cutSquare(S,T)=>
+   T.point1 #= S.leftTopPoint,
+   T.point2 #= S.leftBottomPoint,
+   T.point3 #= S.rightBottomPoint.
+
+divideTriangle(_,0,Ts,TsR)=>Ts=TsR.
+divideTriangle(T,N,Ts,TsR)=>
+   Ts=[T1,T2,T3|Ts1],
+   P1 = T.point1, P2 = T.point2, P3 = T.point3,
+   %%
+   T1 = new_triangle(),T1.fill #= 0,
+   T1.point1 #= P1, center(T1.point2,P1,P2), center(T1.point3,P1,P3),
+   %%
+   T2 = new_triangle(), T2.fill #= 0,
+   center(T2.point1,P1,P2), T2.point2 #= P2, center(T2.point3,P2,P3),
+   %%
+   T3 = new_triangle(), T3.fill #= 0,
+   center(T3.point1,P1,P3), center(T3.point2,P2,P3), T3.point3 #= P3,
+   %%
+   N1 #= N-1,
+   divideTriangle(T1,N1,Ts1,Ts2),
+   divideTriangle(T2,N1,Ts2,Ts3),
+   divideTriangle(T3,N1,Ts3,TsR).
+
+center(CP,P1,P2)=>
+   CP[1] #= (P1[1]+P2[1])//2,
+   CP[2] #= (P1[2]+P2[2])//2.
+
