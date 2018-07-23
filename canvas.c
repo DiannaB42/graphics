@@ -70,6 +70,7 @@ struct Texts{
   int boarder;
   int font;
   int fontSize;
+  int fontStyle;
   int padding;
 };
 
@@ -173,6 +174,7 @@ int redraw_cb( Ihandle *self, float x, float y )
   int curAlign;
   int curFont;
   int curFontSize;
+  int curStyle;
   cdCanvasActivate(cdcanvas);
   cdCanvasClear(cdcanvas);
   cdCanvasForeground(cdcanvas, CD_RED);
@@ -187,6 +189,8 @@ int redraw_cb( Ihandle *self, float x, float y )
   curFont = 3;
   setFontSize(12);
   curFontSize = 12;
+  setFontStyle(3);
+  curStyle = 3;
   while(node != NULL){
     if(node->color != curColor){
       setColor(node->color);
@@ -252,12 +256,17 @@ int redraw_cb( Ihandle *self, float x, float y )
 	  setFontSize(text->fontSize);
 	  curFontSize = text->fontSize;
 	}
+        if(curStyle != text->fontStyle){
+	  setFontStyle(text->fontStyle);
+	  curStyle = text->fontStyle; 	
+	}
         cdCanvasText(cdcanvas, text->x1, *height - text->y1, text->text);
         if(text->boarder == 1){
           int* w = malloc(sizeof(int));
           int* h = malloc(sizeof(int));
           int pad = text->padding;
           cdCanvasGetTextSize(cdcanvas, text->text, w, h);
+	  //The location of the text and rectangle changes with different alignments
           switch(text->align){
             case 1:
 	      cdCanvasRect(cdcanvas,text->x1-*w/2-pad,text->x1+*w/2+ pad,*height-text->y1+pad,*height-text->y1-*h-pad);
@@ -323,6 +332,31 @@ int getFontValue(char* font){
     }
   }
 }
+
+int getFontStyleValue(char* style){
+  if((style != NULL) && (style[0] != '\0')){
+    switch(style[0]){
+      case 'b':
+	if(strcmp(style, "bold") == 0){
+	  return 1;
+	}
+      case 'i':
+	if(strcmp(style, "italic") == 0){
+	  return 2;
+	}
+	break;
+      case 'p':
+	if(strcmp(style, "plain") == 0){
+	  return 3;
+	}
+	break;
+      default:
+	return -1;
+    }
+  }
+  return -1;
+}
+
 
 int getColorValue(char* color){
   if((color != NULL) && (color[0] !='\0')){
@@ -422,6 +456,22 @@ void setFontSize(int fontSize){
   cdCanvasFont(cdcanvas, NULL, -1, fontSize);
 }
 
+
+
+void setFontStyle(int fontStyle){
+  switch(fontStyle){
+    case 1:
+      cdCanvasFont(cdcanvas,NULL, CD_BOLD, 0);
+      break;
+    case 2:
+      cdCanvasFont(cdcanvas,NULL, CD_ITALIC, 0);
+      break;
+    case 3:
+      cdCanvasFont(cdcanvas,NULL, CD_PLAIN, 0);
+      break;
+  }
+
+}
 
 void setAlign(int align){
   switch(align){
@@ -578,7 +628,7 @@ int assignTri(int x1, int y1, int x2, int y2, int x3, int y3, int fill, TagType 
 }
 
 
-int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText, int color, int boarder, int font, int fontSize, int padding){
+int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText, int color, int boarder, int font, int fontSize, int fontStyle, int padding){
   struct Texts* text;
   text = (struct Texts*) malloc(sizeof(struct Texts));
   if(text == NULL){
@@ -592,6 +642,7 @@ int assignText(int cx, int cy, int cw, int ch, int cAlign, char* cText, int colo
   text->align = cAlign;
   text->text = cText;
   text->font = font;
+  text->fontStyle = fontStyle;
   if(padding < 0){
     text->padding = 0;
   } else {
@@ -971,20 +1022,21 @@ c_polygon(){
 }
 
 c_text(){
-  TERM x = 		picat_get_call_arg(1,10);
-  TERM y = 		picat_get_call_arg(2,10);
-  TERM w = 		picat_get_call_arg(3,10);
-  TERM h = 		picat_get_call_arg(4,10);
-  TERM text = 		picat_get_call_arg(5,10);
-  TERM align =		picat_get_call_arg(6,10);
-  TERM color =	 	picat_get_call_arg(7,10);
-  TERM font =		picat_get_call_arg(8,10);
-  TERM fontSize = 	picat_get_call_arg(9,10);
-  TERM padding =	picat_get_call_arg(10,10);
+  TERM x = 		picat_get_call_arg(1,11);
+  TERM y = 		picat_get_call_arg(2,11);
+  TERM w = 		picat_get_call_arg(3,11);
+  TERM h = 		picat_get_call_arg(4,11);
+  TERM text = 		picat_get_call_arg(5,11);
+  TERM align =		picat_get_call_arg(6,11);
+  TERM color =	 	picat_get_call_arg(7,11);
+  TERM font =		picat_get_call_arg(8,11);
+  TERM fontSize = 	picat_get_call_arg(9,11);
+  TERM fontStyle =	picat_get_call_arg(10,11);
+  TERM padding =	picat_get_call_arg(11,11);
   if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h) || !picat_is_integer(padding) || !picat_is_integer(fontSize)){
     return PICAT_ERROR;
   }
-  if(!picat_is_atom(text) || !picat_is_atom(color) || !picat_is_atom(align) || !picat_is_atom(font)){
+  if(!picat_is_atom(text) || !picat_is_atom(color) || !picat_is_atom(align) || !picat_is_atom(font) || !picat_is_atom(fontStyle)){
     return PICAT_ERROR;
   }
   int cx = (int) picat_get_integer(x);
@@ -1004,11 +1056,14 @@ c_text(){
   char* sFont = picat_get_atom_name(font);
   int cFont = getFontValue(sFont);
 
+  char* sStyle = picat_get_atom_name(fontStyle);
+  int cStyle = getFontStyleValue(sStyle);
+  
   if(exception == NULL){
     printf("Error: Exception encountered while converting terms\n");
     return PICAT_ERROR;
   }
-  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 1, cFont, cFontSize, cPadding) == 0){
+  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 1, cFont, cFontSize, cStyle, cPadding) == 0){
     return PICAT_TRUE;
   } else {
     return PICAT_ERROR;
@@ -1016,19 +1071,20 @@ c_text(){
 }
 
 c_label(){
-  TERM x = 		picat_get_call_arg(1,9);
-  TERM y = 		picat_get_call_arg(2,9);
-  TERM w = 		picat_get_call_arg(3,9);
-  TERM h = 		picat_get_call_arg(4,9);
-  TERM text = 		picat_get_call_arg(5,9);
-  TERM align =		picat_get_call_arg(6,9);
-  TERM color = 		picat_get_call_arg(7,9);
-  TERM font = 		picat_get_call_arg(8,9);
-  TERM fontSize = 	picat_get_call_arg(9,9);
+  TERM x = 		picat_get_call_arg(1,10);
+  TERM y = 		picat_get_call_arg(2,10);
+  TERM w = 		picat_get_call_arg(3,10);
+  TERM h = 		picat_get_call_arg(4,10);
+  TERM text = 		picat_get_call_arg(5,10);
+  TERM align =		picat_get_call_arg(6,10);
+  TERM color = 		picat_get_call_arg(7,10);
+  TERM font = 		picat_get_call_arg(8,10);
+  TERM fontSize = 	picat_get_call_arg(9,10);
+  TERM fontStyle =	picat_get_call_arg(10,10);
   if(!picat_is_integer(x) || !picat_is_integer(y) || !picat_is_integer(w) || !picat_is_integer(h)|| !picat_is_integer(fontSize)){
     return PICAT_ERROR;
   }
-  if(!picat_is_atom(text) || !picat_is_atom(color) || !picat_is_atom(align)|| !picat_is_atom(font)){
+  if(!picat_is_atom(text) || !picat_is_atom(color) || !picat_is_atom(align)|| !picat_is_atom(font) || !picat_is_atom(fontStyle)){
     return PICAT_ERROR;
   }
   int cx = (int) picat_get_integer(x);
@@ -1036,18 +1092,26 @@ c_label(){
   int cw = (int) picat_get_integer(w);
   int ch = (int) picat_get_integer(h);
   int cFontSize = (int) picat_get_integer(fontSize);
+
   char* cText = picat_get_atom_name(text);
+
   char* buffer = picat_get_atom_name(color);
   int iColor = getColorValue(buffer);
+
   char* sAlign = picat_get_atom_name(align);
   int cAlign = getAlignValue(sAlign);
+
   char* sFont = picat_get_atom_name(font);
   int cFont = getFontValue(sFont);
+
+  char* sStyle = picat_get_atom_name(fontStyle);
+  int cStyle = getFontStyleValue(sStyle);
+
   if(exception == NULL){
     printf("Error: Exception encountered while converting terms\n");
     return PICAT_ERROR;
   }
-  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 0, cFont,cFontSize, 0) == 0){
+  if(assignText(cx, cy, cw, ch, cAlign, cText, iColor, 0, cFont,cFontSize,cStyle, 0) == 0){
     return PICAT_TRUE;
   } else {
     return PICAT_ERROR;
