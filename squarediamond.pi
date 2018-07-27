@@ -1,0 +1,47 @@
+/********************************************************************
+    Constraint-based Graphical Programming in Picat
+    %
+    draw nested squares and diamonds
+*********************************************************************/
+import cg.
+go=>
+    squarediamonds(Os),
+    show(Os).    
+
+squarediamonds(Os)=>
+    S = new_square(), S.fill #= 0, S.width #>= 500,
+    P = new_polygon(4), P.fill #= 0,
+    squareToPolygon(S,P),
+    diamondsAndSquares(P,20,Ps),
+    Os=[S,P|Ps].
+
+squareToPolygon(S,P)=>
+    Sx2 #= S.x + S.width,
+    Sy2 #= S.y + S.height,
+    P.xs = [S.x, S.x, Sx2, Sx2],
+    P.ys = [S.y, Sy2, Sy2, S.y].
+
+diamondsAndSquares(S,0,Ps)=>Ps=[].
+diamondsAndSquares(S,N,Os)=>
+    P = new_polygon(4), P.fill #= 0,
+    %(N mod 2=:=0 -> P.color #= red; true),
+    Sx = S.xs,
+    Sy = S.ys,
+    Px1 #= (Sx[1]+Sx[2])//2, 
+    Py1 #= (Sy[1]+Sy[2])//2,
+    Px2 #= (Sx[2]+Sx[3])//2,
+    Py2 #= (Sy[2]+Sy[3])//2,
+    Px3 #= (Sx[3]+Sx[4])//2,
+    Py3 #= (Sy[3]+Sy[4])//2,
+    Px4 #= (Sx[4]+Sx[1])//2,
+    Py4 #= (Sy[4]+Sy[1])//2,
+    P.xs = [Px1, Px2, Px3, Px4],
+    P.ys = [Py1, Py2, Py3, Py4],
+    N1 = N-1,
+    diamondsAndSquares(P,N1,Ps),
+    Os = [P|Ps].
+
+center(CX,CY,P1,P2)=>
+    CX #= (P1[1]+P2[1])//2,
+    CY #= (P1[2]+P2[2])//2.
+

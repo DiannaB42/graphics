@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <iup/iup.h>
+#include <iup.h>
 #include <cd/cd.h>
 #include <cd/cdiup.h>
 #include "picat.h"
@@ -84,6 +84,56 @@ struct Drawing {
 static struct Drawing* drawings = NULL;
 static struct Drawing* last = NULL;
 static char canvasSize[100];
+
+
+c_textSize(){
+  TERM text = 	picat_get_call_arg(1,6);
+  TERM font = 	picat_get_call_arg(2,6);
+  TERM size = 	picat_get_call_arg(3,6);
+  TERM style = 	picat_get_call_arg(4,6);
+  TERM pWidth = picat_get_call_arg(5,6);
+  TERM pHeight =picat_get_call_arg(6,6);
+  if(!picat_is_integer(size)){
+    return PICAT_ERROR;
+  }
+  if(!picat_is_atom(text) || !picat_is_atom(font) || !picat_is_atom(style)){
+    return PICAT_ERROR;
+  }
+  if(!picat_is_var(pHeight) || !picat_is_var(pWidth)){
+    return PICAT_ERROR;
+  }
+  char* cText = picat_get_atom_name(text);
+  char* cFont = picat_get_atom_name(font);
+  char* cStyle = picat_get_atom_name(style);
+
+  long cSize = picat_get_integer(size);
+
+  Ihandle *dlg;
+  IupOpen(NULL, NULL);
+  Ihandle *can = IupCanvas(NULL);
+  dlg = IupDialog(IupVbox(can, NULL));
+  IupMap(dlg);
+  cdcanvas = cdCreateCanvas(CD_IUP, can);
+  if(cSize > 0){
+    setFontSize((int) cSize);
+  }
+  int iFont = getFontValue(cFont);
+  setFont(iFont);
+
+  int iStyle = getFontStyleValue(cStyle);
+  setFontStyle(iStyle);
+
+  int *width = malloc(sizeof(int));
+  int *height = malloc(sizeof(int));
+  cdCanvasGetTextSize(cdcanvas, cText, width, height);
+  picat_unify(pWidth, picat_build_integer((long) *width));
+  picat_unify(pHeight, picat_build_integer((long) *height));
+  free(width);
+  free(height);
+  return PICAT_TRUE;
+}
+
+
 
 void setColor(int color){
   switch(color){

@@ -1103,6 +1103,8 @@ void Cboot() {
     insert_cpred("c_text", 11, c_text);
     extern int c_label();
     insert_cpred("c_label", 10, c_label);
+    extern int c_textSize();
+    insert_cpred("c_textSize", 6, c_textSize);
 
     insert_cpred("c_COPY_TERM",2,c_COPY_TERM);
     insert_cpred("c_DECREMENTARG",2,c_DECREMENTARG);
