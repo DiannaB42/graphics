@@ -1,12 +1,16 @@
 # graphics
 
-Hello World
+##Hello World Program
 
-import cg.					1
-go=>						2
-	Hello = new_text_box(),		3
-	Hello.text = ‘hello world’,		4
-	show(Hello).				5
+```import cg.					1
+
+go =>						2
+
+   Hello = new_text_box(),			3
+	
+   Hello.text = ‘hello world’,			4
+	
+   show(Hello).					5```
 
 First we need to import the constraint-based solver which is done with line 1. new_text_box() on line 3 creates a new text object which is assigned to the variable Hello. Initially no text is assigned. The words are set to the string(atom?) in  line 4 by using the text aspect of the text box. To display the object, you must call show() function with the single object you wish to display or multiple objects to be displayed in a list. Objects at the beginning of the list will be drawn first so they may be covered by later objects in the list.
  
