@@ -1,0 +1,57 @@
+import cg.
+/********************************************************************
+    Constraint-based Graphical Programming
+    Originally in B-Prolog, translated to Picat
+    %
+    draw fancy circles
+*********************************************************************/
+go=>
+    circles.
+
+circles=>
+    N = 31,
+    T= new_list(N),
+    foreach ( I in 1..N)
+       T[I] = new_circle(),
+       T[I].centerY #= T[1].centerY
+       %T[I].fill = 0
+    end,
+    T[2].width #> 200,
+    %
+    T = [_|Circles],
+    constrainSize(T,1,N),
+    constrainColor(Circles),
+    %
+    show(T).
+
+constrainSize(T,N0,N)=>
+    I = 2*N0,
+    J = 2*N0+1,
+    C0 = T[N0],
+    C1 = T[I],
+    C2 = T[J],
+    C0.diameter #= 2*C1.diameter,
+    C2.diameter #= C1.diameter,
+    C1.x #= C0.x, C2.x #= C0.centerX,
+    N1 = N0 + 1,
+    if N0 * 2 < N - 1 then
+       constrainSize(T,N1,N)
+    end.
+constrainSize(_T,_N0,_N)=> true.
+
+%two circles that are of the same size must have the same color
+%and two circles that are of different sizes must have different colors
+constrainColor([]) => true.
+constrainColor([_]) => true.
+constrainColor([C|Cs])=>
+    constrainColor(C,Cs),
+    constrainColor(Cs).
+
+constrainColor(_C,[])=> true.
+constrainColor(C,[C1|Cs])=>
+    ( C.color #= red; C.color #= pink; C.color #= gray; C.color #= blue;C.color #= green),
+    (C.diameter #= C1.diameter) #=> C.color #= C1.color,
+    (C.diameter #!= C1.diameter) #=> C.color #!= C1.color,     
+     constrainColor(C,Cs).
+
+

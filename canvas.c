@@ -130,6 +130,7 @@ c_textSize(){
   picat_unify(pHeight, picat_build_integer((long) *height));
   free(width);
   free(height);
+  IupClose();
   return PICAT_TRUE;
 }
 
@@ -164,6 +165,14 @@ void setColor(int color){
     case 9:
       cdCanvasForeground(cdcanvas, CD_WHITE);
       break;
+    case 10:
+      cdCanvasForeground(cdcanvas, cdEncodeColor(128,0,128));
+      break;
+    case 11:
+      cdCanvasForeground(cdcanvas, cdEncodeColor(255,87,51));
+      break;
+    case 12:
+      cdCanvasForeground(cdcanvas, cdEncodeColor(192,192,192));
   }
 }
 
@@ -310,8 +319,10 @@ int redraw_cb( Ihandle *self, float x, float y )
 	  setFontStyle(text->fontStyle);
 	  curStyle = text->fontStyle; 	
 	}
-        cdCanvasText(cdcanvas, text->x1, *height - text->y1, text->text);
-        if(text->boarder == 1){
+        if(text->boarder == 0){
+          cdCanvasText(cdcanvas, text->x1, *height - text->y1, text->text);
+        }
+        else if(text->boarder == 1){
           int* w = malloc(sizeof(int));
           int* h = malloc(sizeof(int));
           int pad = text->padding;
@@ -319,13 +330,16 @@ int redraw_cb( Ihandle *self, float x, float y )
 	  //The location of the text and rectangle changes with different alignments
           switch(text->align){
             case 1:
-	      cdCanvasRect(cdcanvas,text->x1-*w/2-pad,text->x1+*w/2+ pad,*height-text->y1+pad,*height-text->y1-*h-pad);
+              cdCanvasText(cdcanvas, text->x1,*height-text->y1-pad,text->text);
+	      cdCanvasRect(cdcanvas,text->x1-*w/2-pad,text->x1+*w/2+pad,*height-text->y1,*height-text->y1-*h-2*pad);
 	      break;
             case 2:
-              cdCanvasRect(cdcanvas,text->x1-pad,text->x1+*w+pad,*height-text->y1+pad,*height-text->y1-*h-pad);
+              cdCanvasText(cdcanvas, text->x1 + pad, *height - text->y1 - pad, text->text);
+              cdCanvasRect(cdcanvas,text->x1,text->x1+*w+ 2 * pad,*height-text->y1,*height-text->y1-*h-2*pad);
               break;
             case 3:
-	      cdCanvasRect(cdcanvas,text->x1-*w-pad,text->x1+pad,*height-text->y1+pad,*height-text->y1-*h-pad);
+              cdCanvasText(cdcanvas, text->x1-pad, *height - text->y1 - pad, text->text);
+	      cdCanvasRect(cdcanvas,text->x1-*w- 2*pad,text->x1,*height-text->y1,*height-text->y1-*h-2*pad);
 	      break;
           }
           free(w);
@@ -432,24 +446,36 @@ int getColorValue(char* color){
           return 7;
         }
         break;
+      case 'o':
+	if(strcmp(color, "orange") == 0){
+	  return 11;
+	}
+	break;
       case 'p':
         if(strcmp(color, "pink") == 0){
           return 6;
-        }
+        } else if ( strcmp(color, "purple") ==0 ){
+	  return 10;
+	}
         break;
       case 'r':
         if( strcmp(color, "red") == 0){
           return 1;
         }
         break;
-      case 'y':
-        if(strcmp(color, "yellow") == 0){
-          return 3;
-        }
-        break;
+      case 's':
+	if(strcmp(color, "silver") == 0){
+	  return 12;
+	}
+	break;
       case 'w':
         if(strcmp(color, "white") == 0){
           return 9;
+        }
+        break;
+      case 'y':
+        if(strcmp(color, "yellow") == 0){
+          return 3;
         }
         break;
       default:

@@ -187,12 +187,29 @@ color(Component) = H, cg_component(Component) =>
 color(Component) = _H =>
     handle_exception($cg_component_expected(Component),color).
 
+preferredWidth('_TextBox'(_Component,Text,_Alignment,Font,Padding,FontSize,FontStyle)) = PrefWidth => 
+   cgInstantiateFont(Font),
+   cgInstantiatePadding(Padding),
+   cgInstantiateFontSize(FontSize),
+   cgInstantiateFontStyle(FontStyle),
+   bp.c_textSize(Text,Font,FontSize,FontStyle, X, _),
+   PrefWidth = 2*Padding + X.
+
+
 preferredWidth('_Component'(_X,_Y,_W,_H,_Window,_Color,PW,_PH,_No,_Handlers)) = PrefWidth =>
     PrefWidth = PW.
 preferredWidth(Component) = PrefWidth, cg_component(Component) =>
     PrefWidth = preferredWidth(Component[1]).
 preferredWidth(Component) = _ =>
     handle_exception($cg_component_expected(Component),preferredWidth).
+
+preferredHeight('_TextBox'(_Component,Text,_Alignment,Font,Padding,FontSize,FontStyle)) = PrefHeight => 
+   cgInstantiateFont(Font),
+   cgInstantiatePadding(Padding),
+   cgInstantiateFontSize(FontSize),
+   cgInstantiateFontStyle(FontStyle),
+   bp.c_textSize(Text,Font,FontSize,FontStyle, _, Y),
+   PrefHeight = 2*Padding + Y.
 
 preferredHeight('_Component'(_X,_Y,_W,_H,_Window,_Color,_PW,PH,_No,_Handlers)) = PrefHeight =>
     PrefHeight = PH.
@@ -807,13 +824,13 @@ cgInstantiateComponent('_Label'(Component,_Text,Alignment,Font,FontSize,FontStyl
     cgInstantiateFont(Font),
     cgInstantiateFontSize(FontSize),
     cgInstantiateFontStyle(FontStyle).
-cgInstantiateComponent('_TextBox'(Component,_Text,Alignment,Font,Padding,FontSize,FontStyle)) =>
+cgInstantiateComponent('_TextBox'(Component,_Text,Alignment,_Font,_Padding,_FontSize,_FontStyle)) =>
     cgInstantiateComponent(Component),
-    cgInstantiateAlignment(Alignment),
-    cgInstantiateFont(Font),
-    cgInstantiatePadding(Padding),
-    cgInstantiateFontSize(FontSize),
-    cgInstantiateFontStyle(FontStyle).
+    cgInstantiateAlignment(Alignment).
+    %cgInstantiateFont(Font),
+    %cgInstantiatePadding(Padding),
+    %cgInstantiateFontSize(FontSize),
+    %cgInstantiateFontStyle(FontStyle).
 cgInstantiateComponent('_Line'(Component,_X1,_Y1,_X2,_Y2,_Ext)) =>
     cgInstantiateComponent(Component).
 cgInstantiateComponent('_Oval'(Component,Fill)) =>
@@ -833,15 +850,18 @@ cgInstantiateComponent('_RoundRectangle'(Component,ArcWidth,ArcHeight,Fill)) =>
 cgInstantiateComponent('_Square'(Component,Fill)) =>
     cgInstantiateBool(Fill),
     cgInstantiateComponent(Component).
+
 cgInstantiateComponent(Comp@'_Star'(Component,_N,_X0,_Y0,_Angle0,_SmallDiameter,Fill)) =>
     cgInstantiateBool(Fill),
     cgPackStar(Comp),
     cgInstantiateComponent(Component).
+
 cgInstantiateComponent('_Triangle'(Component,_X1,_Y1,_X2,_Y2,_X3,_Y3,Fill)) =>
     cgInstantiateBool(Fill),
     cgInstantiateComponent(Component).
 cgInstantiateComponent(_) => true.
     
+
 cgInstantiateBool(X) => (X=1; X=0).
 
 cgInstantiateString(T), var(T) => T = "".
@@ -870,6 +890,7 @@ cgPackStar('_Star'(Component,_N,X0,Y0,Angle0,SmallDiameter,_Fill)) =>
     CenterX #= X+W//2,
     CenterY #= Y+H//2,
     PI = pi,
+    %SmallDiameter #= round(W*2//5),
     (var(SmallDiameter) -> SmallDiameter is round(W*2/5); true),
     (var(Angle0) -> Angle0 = 90; true),
     (var(X0)-> X0 is CenterX+round(W/2*cos(Angle0/180*PI)); true),
