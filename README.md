@@ -2,7 +2,8 @@
 
 ##Hello World Program
 
-```import cg.					1
+```
+import cg.					1
 
 go =>						2
 
@@ -10,7 +11,8 @@ go =>						2
 	
    Hello.text = ‘hello world’,			4
 	
-   show(Hello).					5```
+   show(Hello).					5
+```
 
 First we need to import the constraint-based solver which is done with line 1. new_text_box() on line 3 creates a new text object which is assigned to the variable Hello. Initially no text is assigned. The words are set to the string(atom?) in  line 4 by using the text aspect of the text box. To display the object, you must call show() function with the single object you wish to display or multiple objects to be displayed in a list. Objects at the beginning of the list will be drawn first so they may be covered by later objects in the list.
  
@@ -199,13 +201,15 @@ Attributes
 Triangle has additional attributes of point1, point2, and point3, the three points of a triangle.
 
 Example program 
-`import cg.
+```
+import cg.
 Main =>
 	Tri = new_triangle(),
 	Sq = new_square(),
 	Tri.point1 #= Sq.leftTopPoint,
 	Tri.point2 #= Sq.rightTopPoint,
 	Tri.point3 #= Sq.leftBottomPoint,
+```
 
 Objects that have been created are shown with a call to show. Show must be sent a single object or a list of objects ordered in the order in which they will be drawn. Show can be called multiple times, each time it will open a window with the objects that have been drawn since the start of the program. To clear objects from the window, you must call clear which will clear the canvas of all objects previously drawn.
 
@@ -213,19 +217,22 @@ It is not necessary to show all the objects that have been created. For example 
 
 Eg
 
-`Show =[Show1,Show2,Show3,Show4,Show5],
-Extra = [Extra1,Extra2,Extra3,Extra4],
-foreach (I in Show)
-	I = new_rectangle()
-end,
-foreach (J in Extra)
-	J = new_circle()
-end,
-grid([[Show1, Extra1, Show2],
-	[Extra2, Show3, Extra3],
-	[Show4, Extra4, Show5]]),
-show(Show).`
-
-In this example, only Show1-6 will be drawn and the pattern will look like (Make figure of program) if no other constraints are given.
+```
+import cg.
+main =>
+	Show =[Show1,Show2,Show3,Show4,Show5],
+	Extra = [Extra1,Extra2,Extra3,Extra4],
+	foreach (I in Show)
+		I = new_rectangle()
+	end,
+	foreach (J in Extra)
+		J = new_circle()
+	end,
+	grid([[Show1, Extra1, Show2],
+	      [Extra2, Show3, Extra3],
+	      [Show4, Extra4, Show5]]),
+	show(Show).
+```
+In this example, only Show1-5 will be drawn and the pattern will look like Figure 1 if no other constraints are given.
 
 
