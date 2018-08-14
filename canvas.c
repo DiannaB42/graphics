@@ -138,41 +138,54 @@ c_textSize(){
 
 void setColor(int color){
   switch(color){
-    case 1:
+    case 1: //red color
       cdCanvasForeground(cdcanvas, CD_RED);
       break;
-    case 2:
+    case 2: //dark red color
       cdCanvasForeground(cdcanvas, CD_DARK_RED);
       break;
-    case 3:
+    case 3: //yellow color
       cdCanvasForeground(cdcanvas, CD_YELLOW);
       break;
-    case 4:
-      cdCanvasForeground(cdcanvas, CD_GREEN);
+    case 4: //green color
+      cdCanvasForeground(cdcanvas, cdEncodeColor(0,128,0));
       break;
-    case 5:
+    case 5: //blue color
       cdCanvasForeground(cdcanvas, CD_BLUE);
       break;
-    case 6:
+    case 6: //pink color
       cdCanvasForeground(cdcanvas, CD_MAGENTA);
       break;
-    case 7:
+    case 7: //silver color
       cdCanvasForeground(cdcanvas, CD_GRAY);
       break;
-    case 8:
+    case 8: //black color
       cdCanvasForeground(cdcanvas, CD_BLACK);
       break;
-    case 9:
+    case 9: //white color
       cdCanvasForeground(cdcanvas, CD_WHITE);
       break;
-    case 10:
+    case 10: //purple color
       cdCanvasForeground(cdcanvas, cdEncodeColor(128,0,128));
       break;
-    case 11:
+    case 11: //orange color
       cdCanvasForeground(cdcanvas, cdEncodeColor(255,87,51));
       break;
-    case 12:
-      cdCanvasForeground(cdcanvas, cdEncodeColor(192,192,192));
+    case 12: //grey color
+      cdCanvasForeground(cdcanvas, cdEncodeColor(128,128,128));
+      break;
+    case 13: //cyan color
+      cdCanvasForeground(cdcanvas, cdEncodeColor(0,255,255));
+      break;
+    case 14: //gold color
+      cdCanvasForeground(cdcanvas, cdEncodeColor(218,165,32));
+      break;
+    case 15: //lime green color
+      cdCanvasForeground(cdcanvas, cdEncodeColor(0,255,0));
+      break;
+    case 16: //salmon color
+      cdCanvasForeground(cdcanvas, cdEncodeColor(250,128,144));
+      break;
   }
 }
 
@@ -258,21 +271,21 @@ int redraw_cb( Ihandle *self, float x, float y )
     switch(node->type){
       case 1: ;
         struct Lines *line = node->value;
-        cdCanvasLine(cdcanvas, line->x1, *height - line->y1, line->x2, *height - line->y2);
+        cdCanvasLine(cdcanvas,line->x1,*height-line->y1-1,line->x2,*height-line->y2-1);
         break;
       case 0: ;
         struct Circles *circle = node->value;
         if(circle->fill == 0){
-          cdCanvasArc(cdcanvas, circle->x1, *height - circle->y1, circle->x2,circle->y2, circle->angle1, circle->angle2+ circle->angle1);
+          cdCanvasArc(cdcanvas,circle->x1,*height-circle->y1-1,circle->x2,circle->y2-1,circle->angle1,circle->angle2+circle->angle1);
         }else
-          cdCanvasSector(cdcanvas, circle->x1, *height - circle->y1, circle->x2, circle->y2, circle->angle1,circle->angle2+circle->angle1);
+          cdCanvasSector(cdcanvas,circle->x1,*height-circle->y1-1,circle->x2,circle->y2-1,circle->angle1,circle->angle2+circle->angle1);
         break;
       case 2: ;
         struct Rects *rect = node->value;
         if(rect->fill == 0){
-          cdCanvasRect(cdcanvas, rect->x1, rect->x2, *height - rect->y1, *height - rect->y2);
+          cdCanvasRect(cdcanvas,rect->x1,rect->x2,*height-rect->y1-1,*height-rect->y2-1);
         } else {
-          cdCanvasBox(cdcanvas, rect->x1, rect->x2, *height - rect->y1, *height - rect->y2);
+          cdCanvasBox(cdcanvas,rect->x1,rect->x2,*height-rect->y1-1,*height-rect->y2-1);
         }
         break;
       case 3: ;
@@ -282,9 +295,9 @@ int redraw_cb( Ihandle *self, float x, float y )
         } else {
           cdCanvasBegin(cdcanvas, CD_FILL);
         }
-        cdCanvasVertex(cdcanvas, tri->x1, *height - tri->y1);
-        cdCanvasVertex(cdcanvas, tri->x2, *height - tri->y2);
-        cdCanvasVertex(cdcanvas, tri->x3, *height - tri->y3);
+        cdCanvasVertex(cdcanvas,tri->x1,*height-tri->y1-1);
+        cdCanvasVertex(cdcanvas,tri->x2,*height-tri->y2-1);
+        cdCanvasVertex(cdcanvas,tri->x3,*height-tri->y3-1);
         cdCanvasEnd(cdcanvas);
         break;
       case 4: ;
@@ -296,7 +309,7 @@ int redraw_cb( Ihandle *self, float x, float y )
           cdCanvasBegin(cdcanvas, CD_FILL);
         }
         while(vertex != NULL){
-	  cdCanvasVertex(cdcanvas, vertex->x,*height - vertex->y);
+	  cdCanvasVertex(cdcanvas,vertex->x,*height-vertex->y-1);
           vertex = vertex->next;
         }
         cdCanvasEnd(cdcanvas);
@@ -320,26 +333,26 @@ int redraw_cb( Ihandle *self, float x, float y )
 	  curStyle = text->fontStyle; 	
 	}
         if(text->boarder == 0){
-          cdCanvasText(cdcanvas, text->x1, *height - text->y1, text->text);
+          cdCanvasText(cdcanvas,text->x1,*height-text->y1-1,text->text);
         }
         else if(text->boarder == 1){
           int* w = malloc(sizeof(int));
           int* h = malloc(sizeof(int));
           int pad = text->padding;
-          cdCanvasGetTextSize(cdcanvas, text->text, w, h);
+          cdCanvasGetTextSize(cdcanvas,text->text,w,h);
 	  //The location of the text and rectangle changes with different alignments
           switch(text->align){
             case 1:
-              cdCanvasText(cdcanvas, text->x1,*height-text->y1-pad,text->text);
-	      cdCanvasRect(cdcanvas,text->x1-*w/2-pad,text->x1+*w/2+pad,*height-text->y1,*height-text->y1-*h-2*pad);
+              cdCanvasText(cdcanvas,text->x1,*height-text->y1-pad-1,text->text);
+	      cdCanvasRect(cdcanvas,text->x1-*w/2-pad,text->x1+*w/2+pad,*height-text->y1-1,*height-text->y1-*h-2*pad-1);
 	      break;
             case 2:
-              cdCanvasText(cdcanvas, text->x1 + pad, *height - text->y1 - pad, text->text);
-              cdCanvasRect(cdcanvas,text->x1,text->x1+*w+ 2 * pad,*height-text->y1,*height-text->y1-*h-2*pad);
+              cdCanvasText(cdcanvas,text->x1+pad,*height-text->y1-pad-1,text->text);
+              cdCanvasRect(cdcanvas,text->x1,text->x1+*w+2*pad,*height-text->y1-1,*height-text->y1-*h-2*pad-1);
               break;
             case 3:
-              cdCanvasText(cdcanvas, text->x1-pad, *height - text->y1 - pad, text->text);
-	      cdCanvasRect(cdcanvas,text->x1-*w- 2*pad,text->x1,*height-text->y1,*height-text->y1-*h-2*pad);
+              cdCanvasText(cdcanvas,text->x1-pad,*height-text->y1-pad-1,text->text);
+	      cdCanvasRect(cdcanvas,text->x1-*w-2*pad,text->x1,*height-text->y1-1,*height-text->y1-*h-2*pad-1);
 	      break;
           }
           free(w);
@@ -433,6 +446,11 @@ int getColorValue(char* color){
           return 8;
         }
         break;
+      case 'c':
+        if(strcmp(color, "cyan") == 0){
+          return 13;
+        }     
+        break;
       case 'd':
         if(strcmp(color, "dark_red") == 0 || strcmp(color,"dark red") == 0){
           return 2;
@@ -443,8 +461,16 @@ int getColorValue(char* color){
           return 4;
         }
         if(strcmp(color, "grey") == 0|| strcmp(color, "gray") == 0){
-          return 7;
+          return 12;
         }
+ 	if(strcmp(color, "gold") ==0){
+	  return 14;
+	}
+        break;
+      case 'l':
+ 	if(strcmp(color, "lime") ==0){
+	  return 15;
+	}
         break;
       case 'o':
 	if(strcmp(color, "orange") == 0){
@@ -465,7 +491,10 @@ int getColorValue(char* color){
         break;
       case 's':
 	if(strcmp(color, "silver") == 0){
-	  return 12;
+	  return 7;
+	}
+	if(strcmp(color, "salmon") == 0){
+	  return 16;
 	}
 	break;
       case 'w':
@@ -1213,7 +1242,7 @@ c_canvas()
   IupSetAttribute(cnvs, "SIZE", canvasSize);
 
   dlg = IupDialog( IupVbox( cnvs, NULL ) );
-  IupSetAttribute(dlg, "TITLE", "IupCanvas + Canvas Draw" );
+  IupSetAttribute(dlg, "TITLE", "Picat 2.4" );
   IupSetAttribute(dlg, "MARGIN", "10x10");
   IupMap( dlg );
 

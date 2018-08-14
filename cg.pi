@@ -188,6 +188,7 @@ color(Component) = _H =>
     handle_exception($cg_component_expected(Component),color).
 
 preferredWidth('_TextBox'(_Component,Text,_Alignment,Font,Padding,FontSize,FontStyle)) = PrefWidth => 
+   cgInstantiateText(Text),
    cgInstantiateFont(Font),
    cgInstantiatePadding(Padding),
    cgInstantiateFontSize(FontSize),
@@ -195,6 +196,13 @@ preferredWidth('_TextBox'(_Component,Text,_Alignment,Font,Padding,FontSize,FontS
    bp.c_textSize(Text,Font,FontSize,FontStyle, X, _),
    PrefWidth = 2*Padding + X.
 
+preferredWidth('_Label'(_Component,Text,_Alignment,Font,FontSize,FontStyle)) = PrefWidth => 
+   cgInstantiateText(Text),
+   cgInstantiateFont(Font),
+   cgInstantiateFontSize(FontSize),
+   cgInstantiateFontStyle(FontStyle),
+   bp.c_textSize(Text,Font,FontSize,FontStyle, X, _),
+   PrefWidth = X.
 
 preferredWidth('_Component'(_X,_Y,_W,_H,_Window,_Color,PW,_PH,_No,_Handlers)) = PrefWidth =>
     PrefWidth = PW.
@@ -204,12 +212,21 @@ preferredWidth(Component) = _ =>
     handle_exception($cg_component_expected(Component),preferredWidth).
 
 preferredHeight('_TextBox'(_Component,Text,_Alignment,Font,Padding,FontSize,FontStyle)) = PrefHeight => 
+   cgInstantiateText(Text),
    cgInstantiateFont(Font),
    cgInstantiatePadding(Padding),
    cgInstantiateFontSize(FontSize),
    cgInstantiateFontStyle(FontStyle),
    bp.c_textSize(Text,Font,FontSize,FontStyle, _, Y),
    PrefHeight = 2*Padding + Y.
+
+preferredHeight('_Label'(_Component,Text,_Alignment,Font,FontSize,FontStyle)) = PrefHeight => 
+   cgInstantiateText(Text),
+   cgInstantiateFont(Font),
+   cgInstantiateFontSize(FontSize),
+   cgInstantiateFontStyle(FontStyle),
+   bp.c_textSize(Text,Font,FontSize,FontStyle, _, Y),
+   PrefHeight =  Y.
 
 preferredHeight('_Component'(_X,_Y,_W,_H,_Window,_Color,_PW,PH,_No,_Handlers)) = PrefHeight =>
     PrefHeight = PH.
@@ -632,6 +649,45 @@ cgConstraintSameAttr(node(Box1,_Children1,_LC1,_RC1,_LM1,_RM1),Type,SameAttr),
 =>
     Box1.x #= SameAttr.
 
+/*************************************************************
+
+*************************************************************/
+cgInside(X,Y) =>
+    cgInsideConstr(X,MinX,MaxX,MinY,MaxY,W,H),
+    cgOutsideConstr(Y,MinX,MaxX,MinY,MaxY,W,H).
+
+cgInside(_,_) =>
+    handle_exception($illegal_component, cgInside()).
+
+
+cgInsideConstr([],_,_,_,_,_,_) => true.
+cgInsideConstr([O|Os],MinX,MaxX,MinY,MaxY,W,H) =>
+    cgInsideConstr(O,MinX,MaxX,MinY,MaxY,W,H),
+    cgInsideConstr(Os,MinX,MaxX,MinY,MaxY,W,H).
+
+cgInsideConstr(O,MinX,MaxX,MinY,MaxY,_W,_H)=>
+    getComponentBound(O,X,Y,W,H),
+    W #=< _W,
+    H #=< _H,
+    X #>= MinX,
+    X+W #=< MaxX,
+    Y #>= MinY,
+    Y+H #=< MaxY.
+
+cgOutsideConstr([],_,_,_,_,_,_) => true.
+cgOutsideConstr([O|Os],MinX,MaxX,MinY,MaxY,W,H) =>
+    cgOutsideConstr(O,MinX,MaxX,MinY,MaxY,W,H),
+    cgOutsideConstr(Os,MinX,MaxX,MinY,MaxY,W,H).
+
+cgOutsideConstr(O,MinX,MaxX,MinY,MaxY,_W,_H)=>
+    getComponentBound(O,X,Y,W,H),
+    W #>= _W,
+    H #>= _H,
+    X #=< MinX,
+    X+W #>= MaxX,
+    Y #=< MinY,
+    Y+H #>= MaxY.
+
 %%% Pack graphical objects to determine the attributes
 %
 cgPack(Comps,Win) =>
@@ -820,17 +876,10 @@ cgInstantiateComponent('_Image'(Component,_Id,_Name)) =>
     cgInstantiateComponent(Component).
 cgInstantiateComponent('_Label'(Component,_Text,Alignment,Font,FontSize,FontStyle)) =>
     cgInstantiateComponent(Component),
-    cgInstantiateAlignment(Alignment),
-    cgInstantiateFont(Font),
-    cgInstantiateFontSize(FontSize),
-    cgInstantiateFontStyle(FontStyle).
+    cgInstantiateAlignment(Alignment).
 cgInstantiateComponent('_TextBox'(Component,_Text,Alignment,_Font,_Padding,_FontSize,_FontStyle)) =>
     cgInstantiateComponent(Component),
     cgInstantiateAlignment(Alignment).
-    %cgInstantiateFont(Font),
-    %cgInstantiatePadding(Padding),
-    %cgInstantiateFontSize(FontSize),
-    %cgInstantiateFontStyle(FontStyle).
 cgInstantiateComponent('_Line'(Component,_X1,_Y1,_X2,_Y2,_Ext)) =>
     cgInstantiateComponent(Component).
 cgInstantiateComponent('_Oval'(Component,Fill)) =>
@@ -866,11 +915,14 @@ cgInstantiateBool(X) => (X=1; X=0).
 
 cgInstantiateString(T), var(T) => T = "".
 
-cgInstantiateColor(X), nonvar(X) => (X=black;X=blue;X=dark_red;X=green;X=grey;X=gray;X=pink;X=red;X=yellow;X=white;X='dark red').
+cgInstantiateColor(X), nonvar(X) => (X=black;X=blue;X=dark_red;X=green;X=grey;X=gray;X=pink;X=red;X=yellow;X=white;X='dark red';X=purple;X=orange; X=silver;X=lime;X=cyan;X=gold;X=salmon).
 cgInstantiateColor(X) => X = black.
 
 cgInstantiateFont(X), nonvar(X) => (X=system;X=courier;X=times;X=helvetica).
 cgInstantiateFont(X) => X = system.
+
+cgInstantiateText(X), nonvar(X) => true.
+cgInstantiateText(X) => X = hello.
 
 cgInstantiateFontStyle(X), nonvar(X) => (X=plain;X=bold;X=italic).
 cgInstantiateFontStyle(X) => X = plain.
@@ -881,9 +933,8 @@ cgInstantiateFontSize(X) => X = 12.
 cgInstantiateAlignment(X), nonvar(X) => (X=left;X=center;X=right).
 cgInstantiateAlignment(X) => X = left.
 
-%cgInstantiatePadding(X),X < 0 => false.
 cgInstantiatePadding(X),nonvar(X) => true.
-cgInstantiatePadding(X) => X = 0.
+cgInstantiatePadding(X) => X = 5.
 
 cgPackStar('_Star'(Component,_N,X0,Y0,Angle0,SmallDiameter,_Fill)) =>
     getComponentBound(Component,X,Y,W,H),
